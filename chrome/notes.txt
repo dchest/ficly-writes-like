@@ -1,3 +1,31 @@
+Here's my plan for parsing the wikitext response, make this call:
+http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&titles=Dan%20Brown&format=jsonfm
+http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&titles=Dan%20Brown&format=jsonfm
+
+(use format=json instead (above it pretty print))
+Look for the pattern="{{(?:[^}]{3,})}}" <--- probably have to escape the {}
+
+once I strip this shit out, I should be able to turn the remaining wikitext into the markup I need
+
+'''(.*?)''' is going to be a bold tag I guess
+
+then [[()]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // test for getting page selection, not sure if it will work
 
 var selection;
@@ -23,3 +51,104 @@ if(!selection) {
 }
 console.log(selection)
 return selection
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+a:1:{s:5:"query";a:2:{s:10:"normalized";a:1:{i:0;a:2:{s:4:"from";s:34:"one  ﬂew over the cuckoo's  nest";s:2:"to";s:32:"One ﬂew over the cuckoo's nest";}}s:5:"pages";a:1:{i:-1;a:3:{s:2:"ns";i:0;s:5:"title";s:32:"One ﬂew over the cuckoo's nest";s:7:"missing";s:0:"";}}}}
+
+
+http://en.wikipedia.org/w/api.php?action=query&prop=templates|info&meta=siteinfo&titles=Dan%20Brown
+
+
+http://en.wikipedia.org/w/api.php?action=query&prop=templates|info&meta=siteinfo&titles=Dan%20Brown
+
+
+
+"http://en.wikipedia.org/w/api.php?action=parse&prop=text&format=json&callback=__WikiCallbacks.fn_&page=Dan%20Brown
+
+
+
+this is close
+http://en.wikipedia.org/w/api.php?action=parse&prop=text|sections|displaytitle&format=jsonfm&callback=__WikiCallbacks.fn_&page=Dan%20Brown
+
+I really just want the summary
+
+submit here:
+    http://www.programmableweb.com/api/wikipedia/mashups
+    
+    http://en.wikipedia.org/w/api.php?action=query&titles=Dan%20Brown&prop=revisions&rvprop=content&rvsection=0
+    
+    
+    this is really close, it has wiki text - can I deal with parsing that????? it might be better than HTML
+    http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=jsonfm&titles=Dan%20Brown
+    this guy::: http://blog.nihilogic.dk/2008/10/wiki-summary-box-012-update.html
+    http://www.nihilogic.dk/labs/wikipedia_summary/sumbox.js
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     /*
+        ficly url, http://ficly.com/stories/19413.atom
+        
+
+                1. takes this atom: parse for story
+                    fuck it, ghetto it out, just parse the HTML - save a call
+                        .entry-content (css class for div)
+                        
+                    -- I don't think the HTML matters, but I might need to escape to send it
+                2. post to iwl.me
+
+                        
+                3. parse HTML response from iwl.me
+                        Get amazon affiliate code (play nice) and use it
+                        
+                        grab the title tag from the response (DOM parse)
+                         - find the author name this way,
+                         look for $(div a)
+                         search all the innerHTML for the author name
+                            when found, get href value for referral code                                    
+                        
+                4. Call wikipedia, get bio - synopsis - style
+                    Add first paragraph (via api)
+                    add 'more >>' link to wikipedia page
+                
+                Add module to the right rail of the page
+                
+                
+         ficly url on this page page:
+            http://ficly.com/authors/elshahawk
+            
+        I can see friends and get the story rss
+            -- use local storage to store comparison, add a button later to 'update' - regrade it
+            
+            
+            
+        always go to wikipedia for information. -- never store it
+                
+     */
+     
+     
+     /*
+        Data Model
+            Author:
+            Story Id: -- use fully qualified url?? http://ficly.com/stories/19413 (this way if URL sctructure changes and they redirect this url I have it... plus I can just append .atom to it)
+            iwl.me comparison author
+            
+            http://ficly.com/authors/elshahawk/stories.atom
+            
+        Cumlative author value
+            -- this writer writes most like (more than 50% of the work)
+     */

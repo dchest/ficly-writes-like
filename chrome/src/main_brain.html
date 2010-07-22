@@ -1,9 +1,12 @@
-<!-- >//chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
+
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <!-- MIME TYPE Guidlines and references: http://hixie.ch/advocacy/xhtml -->
+
+<!-- //chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
+
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -34,12 +37,35 @@
             <script type="text/javascript" charset="utf-8">
                 
                 
+                var iwl_urls = {
+                    "money" : "http://iwl.me/w/",
+                    "share" : "http://iwl.me/s/",
+                    "permalink" : "http://iwl.me/b/"
+                }
+                
+                function localstore( itemKey, itemValue ) {
+                    // do I need to remove this key first??
+                    var response = window.localStorage.setItem( itemKey, window.JSON.stringify( itemValue ) );
+                    return response
+                }
+                
+                function localfetch( itemKey ) {
+                    var item = window.localStorage.getItem( itemKey )
+                    try{
+                        var json_item = JSON.parse(item);
+                        return json_item
+                    } catch(e) {
+                        console.log('Error getting key', itemKey, e)
+                    }
+                    return null;                    
+                }
+                
                 function parseAffiliateLink( message_string, author ) {
                     
                     /*
 <a href="http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
                     */
-                    var pattern = '<a href="(http://iwl.me/.*?)".*>'+ author + '<\/a>'
+                    var pattern = '<a href="http:\/\/iwl.me\/[^/]+\/(.*?)".*>'+ author + '<\/a>'
                     var regex = new RegExp(pattern);
                     var matches = message_string.match(regex)
                     console.log("affiliate match", matches)
@@ -54,106 +80,99 @@
                     return matches && matches[1] || null
                 }
                 
-                function makeRequest( message, callback ) {
+                function makeWikiRequest( author ) {
+                    // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
                     var xhr = new XMLHttpRequest();
-                    document.getElementById("escape_worker").innerHTML = message
-                    console.log(document.getElementById("escape_worker").innerText)
-                    xhr.open("POST", "http://iwl.me/?text=" + document.getElementById("escape_worker").innerText, true)
+                    var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + author
+                    xhr.open("GET", url, true);
                     xhr.onreadystatechange = function() {
                       if (xhr.readyState == 4) {
                         // innerText does not let the attacker inject HTML elements.
                         document.getElementById("escape_worker").innerText = xhr.responseText;
-                        //console.log(document.getElementById("escape_worker").innerText)
-                        callback(document.getElementById("escape_worker").innerText)
+
+                        var json_message = JSON.parse(xhr.responseText)
+                        console.log(json_message)                        
+                      }
+                    }
+                    xhr.send();                    
+                    
+                }
+                
+                function makeRequest( message, callback, type ) {
+                    var xhr = new XMLHttpRequest();
+                    var method_type = type || "GET"
+                    document.getElementById("escape_worker").innerHTML = message
+                    //console.log(document.getElementById("escape_worker").innerText)
+                    var safe_message = document.getElementById("escape_worker").innerText
+                    xhr.open(method_type, "http://iwl.me/?text=" + safe_message, true)
+                    xhr.onreadystatechange = function() {
+                      if (xhr.readyState == 4) {
+                        // innerText does not let the attacker inject HTML elements.
+                        document.getElementById("escape_worker").innerText = xhr.responseText;
+                        callback(document.getElementById("escape_worker").innerText);
+                        // clean up
                         document.getElementById("escape_worker").innerText = ""
-                        // console.log(xhr.responseText)
-                        // console.log(xhr.responseXML)                        
-                        //document.getElementById("resp").innerText = xhr.responseText;
                       }
                     }
                     xhr.send();                    
                 }
                 
+                function iwl_response_handler(  response, callback, page_url ) {
+                    // crap scope problem - this is broken ATM
+                    var iwl_author = parseIWLTitle( response ),
+                        affiliate_link = parseAffiliateLink( response, iwl_author );
+                    //console.log(response, "author");
+                    console.log("more stuff", iwl_author, affiliate_link, page_url )
+                    
+                    //makeWikiRequest( iwl_author )
+                    // save to local storage
+                    var data = {
+                        'author' : iwl_author,
+                        'link' : affiliate_link,
+                        'base_urls' : iwl_urls
+                    };
+                    localstore( page_url, data )
+                    
+                    callback( data );   
+                    
+                    
+                    // put everything like story url or  id into local storage, have the widget script send a 
+                    
+                    chrome.tabs.executeScript(null, {file: "js/content_scripts/ficly_story_widget.js"}); 
+                    
+                                    
+                }
+                
                 chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
-                    console.log(request, "in brain")
-                    console.log(sender)
+                    if(!request.content) return;
+                    console.log(request, "in brain");
+                    console.log(sender);
                     makeRequest( request.content, function(response) {
-                        console.log(response)
-                        var iwl_author = parseIWLTitle( response )
-                        console.log("author", iwl_author)
-                        var affiliate_link = parseAffiliateLink( response, iwl_author )
-                        console.log(affiliate_link)
+                        iwl_response_handler(response, sendResponse, sender.tab.url);
                         
-                        sendResponse({
-                            'author' : iwl_author,
-                            'link' : affiliate_link
-                        });
-                        
-                        // http://en.wikipedia.org/w/api.php?action=opensearch&search=dan%20brown&format=json&callback=spellcheck
-                    } )
+                        /*
+                            here is the money shot:
+                                I have the tab id and URL - therefore I should be able in inject a script into this page
+                        */
+                    }, "POST" )
                     // save the tab id and URL of this page so I can return it correctly
-                })
+                });
+                
+                chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
+                    if(!request.action || request.action !== "buildWidget") return;
+                    
+                    // okay, get the tab url
+                    console.log(sender, "this is the story widget trying to talk to me", request)
+                    sender.tab.url
+                    var data = localfetch(  sender.tab.url )
+                    sendResponse( data )
+                    // save the tab id and URL of this page so I can return it correctly
+                });                
+                
+                
                 
             </script>
-            
-            
-            
-            
-            
-            <script type="text/javascript" charset="utf-8">
-                 /*
-                    ficly url, http://ficly.com/stories/19413.atom
-                    
 
-                            1. takes this atom: parse for story
-                                fuck it, ghetto it out, just parse the HTML - save a call
-                                    .entry-content (css class for div)
-                                    
-                                -- I don't think the HTML matters, but I might need to escape to send it
-                            2. post to iwl.me
-
-                                    
-                            3. parse HTML response from iwl.me
-                                    Get amazon affiliate code (play nice) and use it
-                                    
-                                    grab the title tag from the response (DOM parse)
-                                     - find the author name this way,
-                                     look for $(div a)
-                                     search all the innerHTML for the author name
-                                        when found, get href value for referral code                                    
-                                    
-                            4. Call wikipedia, get bio / synopsis / style
-                                Add first paragraph (via api)
-                                add 'more >>' link to wikipedia page
-                            
-                            Add module to the right rail of the page
-                            
-                            
-                     ficly url on this page page:
-                        http://ficly.com/authors/elshahawk
-                        
-                    I can see friends and get the story rss
-                        -- use local storage to store comparison, add a button later to 'update' / regrade it
-                        
-                        
-                        
-                    always go to wikipedia for information. -- never store it
-                            
-                 */
-                 
-                 
-                 /*
-                    Data Model
-                        Author:
-                        Story Id: -- use fully qualified url?? http://ficly.com/stories/19413 (this way if URL sctructure changes and they redirect this url I have it... plus I can just append .atom to it)
-                        iwl.me comparison author
-                        
-                        http://ficly.com/authors/elshahawk/stories.atom
-                        
-                    Cumlative author value
-                        -- this writer writes most like (more than 50% of the work)
-                 */
-            </script>
       
     </body>
 </html>

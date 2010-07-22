@@ -1,0 +1,15 @@
+#######
+##
+##  copyright (c) gregory tomlinson 2010
+##  Dual licensed under the MIT and GPL licenses.
+##          Stated Intent of License: Allow next developer to use this work is anyway they see fit, karma.
+##
+#######
+
+
+This project contains the following nodes / sections
+    
+    Chrome
+        Google Chrome Extension for the Ficly.com website
+            Actions:
+                1. Takes a Ficly story or blog post, compares against iwl.me

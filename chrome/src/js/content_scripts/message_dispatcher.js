@@ -134,7 +134,7 @@ function phoneHome( message ) {
 }
 
 function brain_callback( message ) {
-    console.log(message)
+    console.log(message, "message from the brain to message_dispatcher.js")
 }
 
 function init() {
