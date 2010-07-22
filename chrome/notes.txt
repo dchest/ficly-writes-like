@@ -1,0 +1,25 @@
+// test for getting page selection, not sure if it will work
+
+var selection;
+if (window.getSelection) {
+selection = window.getSelection();
+} else if (document.getSelection) {
+selection = document.getSelection();
+} else if (document.selection) {
+selection = document.selection.createRange().text;
+}
+if (!selection) {
+selection = '';
+}
+return selection;
+};
+
+
+// this should work  right?
+
+var selection = window.getSelection() || document.getSelection() || document.selection.createRange().text;
+if(!selection) {
+    selection = ''
+}
+console.log(selection)
+return selection

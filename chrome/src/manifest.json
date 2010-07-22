@@ -1,0 +1,30 @@
+{
+  "name": "ficly, writes like",
+  "version": "0.1.1.1",
+  //"options_page": "options.html",
+  "description": "What is that ficly like",
+  "background_page": "main_brain.html",
+  "browser_action": {
+    "default_title": "ficly writes like"
+  },
+  // "chrome_url_overrides": {
+  //     "newtab": "local_history.html"
+  //     },  
+  //"icons" : { 
+    //"48" : "",
+    //"128" : ""    
+  //},
+  "permissions": [
+    "tabs", "http://ficly.com/", "http://iwl.me/"
+  ],
+  
+  "content_scripts": [
+    {
+      // TODO: narrow this match?
+      // look for all patterns here, figure out which page you are and behave accordingly by sending correct message home
+     "matches": ["http://ficly.com/*"],
+     "js": ["js/content_scripts/message_dispatcher.js"]
+    }
+  ]
+}
+// , "update_url": "http:/chrome.bit.ly/bitly_extension_updates.xml"

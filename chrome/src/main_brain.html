@@ -1,0 +1,159 @@
+<!-- >//chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- MIME TYPE Guidlines and references: http://hixie.ch/advocacy/xhtml -->
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="awesome" />
+        <meta name="description" content="" />
+        
+    </head>
+    <body>
+        <div id="container">
+
+            <div id="top">
+
+            </div> <!-- end #top -->
+            
+            <div id="middle">
+
+            </div> <!-- END #middle -->
+        
+            <div id="bottom">
+
+            </div> <!-- end #bottom -->
+            
+            <div id="escape_worker" style="display:none;"></div>
+            
+        </div> <!-- end #container -->
+    
+        
+            <script type="text/javascript" charset="utf-8">
+                
+                
+                function parseAffiliateLink( message_string, author ) {
+                    
+                    /*
+<a href="http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
+                    */
+                    var pattern = '<a href="(http://iwl.me/.*?)".*>'+ author + '<\/a>'
+                    var regex = new RegExp(pattern);
+                    var matches = message_string.match(regex)
+                    console.log("affiliate match", matches)
+                    return matches && matches[1] || null
+                }
+                
+                function parseIWLTitle( message_string ) {
+                    var pattern = "<title>I Write Like (.{3,})<\/title>"
+                    var regex = new RegExp(pattern)
+                    var matches = message_string.match(regex)
+                    //console.log("matches", matches)
+                    return matches && matches[1] || null
+                }
+                
+                function makeRequest( message, callback ) {
+                    var xhr = new XMLHttpRequest();
+                    document.getElementById("escape_worker").innerHTML = message
+                    console.log(document.getElementById("escape_worker").innerText)
+                    xhr.open("POST", "http://iwl.me/?text=" + document.getElementById("escape_worker").innerText, true)
+                    xhr.onreadystatechange = function() {
+                      if (xhr.readyState == 4) {
+                        // innerText does not let the attacker inject HTML elements.
+                        document.getElementById("escape_worker").innerText = xhr.responseText;
+                        //console.log(document.getElementById("escape_worker").innerText)
+                        callback(document.getElementById("escape_worker").innerText)
+                        document.getElementById("escape_worker").innerText = ""
+                        // console.log(xhr.responseText)
+                        // console.log(xhr.responseXML)                        
+                        //document.getElementById("resp").innerText = xhr.responseText;
+                      }
+                    }
+                    xhr.send();                    
+                }
+                
+                chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
+                    console.log(request, "in brain")
+                    console.log(sender)
+                    makeRequest( request.content, function(response) {
+                        console.log(response)
+                        var iwl_author = parseIWLTitle( response )
+                        console.log("author", iwl_author)
+                        var affiliate_link = parseAffiliateLink( response, iwl_author )
+                        console.log(affiliate_link)
+                        
+                        sendResponse({
+                            'author' : iwl_author,
+                            'link' : affiliate_link
+                        });
+                        
+                        // http://en.wikipedia.org/w/api.php?action=opensearch&search=dan%20brown&format=json&callback=spellcheck
+                    } )
+                    // save the tab id and URL of this page so I can return it correctly
+                })
+                
+            </script>
+            
+            
+            
+            
+            
+            <script type="text/javascript" charset="utf-8">
+                 /*
+                    ficly url, http://ficly.com/stories/19413.atom
+                    
+
+                            1. takes this atom: parse for story
+                                fuck it, ghetto it out, just parse the HTML - save a call
+                                    .entry-content (css class for div)
+                                    
+                                -- I don't think the HTML matters, but I might need to escape to send it
+                            2. post to iwl.me
+
+                                    
+                            3. parse HTML response from iwl.me
+                                    Get amazon affiliate code (play nice) and use it
+                                    
+                                    grab the title tag from the response (DOM parse)
+                                     - find the author name this way,
+                                     look for $(div a)
+                                     search all the innerHTML for the author name
+                                        when found, get href value for referral code                                    
+                                    
+                            4. Call wikipedia, get bio / synopsis / style
+                                Add first paragraph (via api)
+                                add 'more >>' link to wikipedia page
+                            
+                            Add module to the right rail of the page
+                            
+                            
+                     ficly url on this page page:
+                        http://ficly.com/authors/elshahawk
+                        
+                    I can see friends and get the story rss
+                        -- use local storage to store comparison, add a button later to 'update' / regrade it
+                        
+                        
+                        
+                    always go to wikipedia for information. -- never store it
+                            
+                 */
+                 
+                 
+                 /*
+                    Data Model
+                        Author:
+                        Story Id: -- use fully qualified url?? http://ficly.com/stories/19413 (this way if URL sctructure changes and they redirect this url I have it... plus I can just append .atom to it)
+                        iwl.me comparison author
+                        
+                        http://ficly.com/authors/elshahawk/stories.atom
+                        
+                    Cumlative author value
+                        -- this writer writes most like (more than 50% of the work)
+                 */
+            </script>
+      
+    </body>
+</html>
