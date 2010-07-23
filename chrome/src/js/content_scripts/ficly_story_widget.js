@@ -34,7 +34,7 @@ function makeWidget( response_data ) {
     console.log("make the widget", response_data)
     var d = make("div"), 
         h1 = make("h1"),
-        p = make("p")
+        p = make("div"), // rename this 
         iwl_link = make("a");
     
     iwl_link.setAttribute("href", response_data.base_urls.permalink + response_data.link)

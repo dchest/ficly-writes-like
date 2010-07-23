@@ -81,7 +81,10 @@
                 }
                 
                 function makewikiLinks( wikitext ) {
-                    var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi;
+                    var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi,
+                        pattern_2 = /''([^'']{2,})?''/mgi,
+                        pattern_3 = /\{\{([^\}\}]{2,})?\}\}/mgi;
+                    
                     var regex = new RegExp( pattern )
                     console.log("running")
                     var finaltext = wikitext.replace(regex, function(m, key, value) {
@@ -92,9 +95,23 @@
                             link_string += encodeURIComponent(splits[0]) + '">';
                             link_string += display_title+'</a>';
                         return link_string;
+                    }).replace( pattern_2, function(m, key, value) {
+                        console.log(m, key, value)
+                        return '<i>' + key + '</i>'
+                    }).replace(pattern_3, function(m, key, value) {
+                          
+                          if( key.indexOf("cite") === 0 ) {
+                              return ""
+                          } 
+                          return m;
                     });
                     
-                    return finaltext;
+                    //.replace("\n\n", '</p><p>');
+                    
+                    finaltext = finaltext.split("\n\n")[0]
+                    
+                    
+                    return '<p>' + finaltext + '</p>';
                 }                
                 
                 
