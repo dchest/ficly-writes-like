@@ -10,7 +10,7 @@
 <!-- //chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
 
     <head>
-        <title></title>
+        <title>ficly writes like brain</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="awesome" />
         <meta name="description" content="" />
@@ -18,293 +18,314 @@
     </head>
     <body>
         <div id="container">
-
-            <div id="top">
-
-            </div> <!-- end #top -->
-            
-            <div id="middle">
-
-            </div> <!-- END #middle -->
-        
-            <div id="bottom">
-
-            </div> <!-- end #bottom -->
             
             <div id="escape_worker" style="display:none;"></div>
             
         </div> <!-- end #container -->
     
         
-            <script type="text/javascript" charset="utf-8">
-                
-                
-                var iwl_urls = {
-                    "money" : "http://iwl.me/w/",
-                    "share" : "http://iwl.me/s/",
-                    "permalink" : "http://iwl.me/b/"
-                }
-                
-                function localstore( itemKey, itemValue ) {
-                    // do I need to remove this key first??
-                    var response = window.localStorage.setItem( itemKey, window.JSON.stringify( itemValue ) );
-                    return response
-                }
-                
-                function localfetch( itemKey ) {
-                    var item = window.localStorage.getItem( itemKey )
-                    try{
-                        var json_item = JSON.parse(item);
-                        return json_item
-                    } catch(e) {
-                        console.log('Error getting key', itemKey, e)
-                    }
-                    return null;                    
-                }
-                
-                function parseAffiliateLink( message_string, author ) {
-                    
-                    /*
-<a href="http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
-                    */
-                    var pattern = '<a href="http:\/\/iwl.me\/[^/]+\/(.*?)".*>'+ author + '<\/a>'
-                    var regex = new RegExp(pattern);
-                    var matches = message_string.match(regex)
-                    console.log("affiliate match", matches)
-                    return matches && matches[1] || null
-                }
-                
-                function parseIWLTitle( message_string ) {
-                    var pattern = "<title>I Write Like (.{3,})<\/title>"
-                    var regex = new RegExp(pattern)
-                    var matches = message_string.match(regex)
-                    //console.log("matches", matches)
-                    return matches && matches[1] || null
-                }
-                
-                function makewikiLinks( wikitext ) {
-                    
-                    // fix this:: <ref name=Themes>Brown. Witness statement; Pages 17 & 21.</ref>
-                    var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi,
-                        comment_pattern = /(<!--(.*)?-->)/mgi,
-                        ref_pattern = /(<ref([^>]*)?>([^<]*)?<\/ref>)?/mgi,
-                        sup_pattern = /(<sup([^>]*)?>([^<]*)?<\/sup>)?/mgi,
-                        pattern_2 = /''([^'']{2,})?''/mgi,
-                        pattern_3 = /\{\{([^\}\}]{2,})?\}\}/mgi;
+   <script type="text/javascript" charset="utf-8">
+       
+       
+       var iwl_urls = {
+           "money" : "http://iwl.me/w/",
+           "share" : "http://iwl.me/s/",
+           "permalink" : "http://iwl.me/b/"
+       }
+       
+       function localstore( itemKey, itemValue ) {
+           // do I need to remove this key first??
+           var response = window.localStorage.setItem( itemKey, window.JSON.stringify( itemValue ) );
+           return response
+       }
+       
+       function localfetch( itemKey ) {
+           var item = window.localStorage.getItem( itemKey )
+           try{
+               var json_item = JSON.parse(item);
+               return json_item
+           } catch(e) {
+               console.log('Error getting key', itemKey, e)
+           }
+           return null;                    
+       }
+       
+       function parseAffiliateLink( message_string, author ) {
+           
+           /*
+http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
+           */
+           var pattern = '<a href="http:\/\/iwl.me\/[^/]+\/(.*?)".*>'+ author + '<\/a>'
+           var regex = new RegExp(pattern);
+           var matches = message_string.match(regex)
+           console.log("affiliate match", matches)
+           return matches && matches[1] || null
+       }
+       
+       function parseIWLTitle( message_string ) {
+           var pattern = "<title>I Write Like (.{3,})<\/title>"
+           var regex = new RegExp(pattern)
+           var matches = message_string.match(regex)
+           //console.log("matches", matches)
+           return matches && matches[1] || null
+       }
+       
+       function makewikiLinks( wikitext ) {
+           
+           // fix this:: <ref name=Themes>Brown. Witness statement; Pages 17 & 21.</ref>
+           var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi,
+               comment_pattern = /(<!--(.*)?-->)/mgi,
+               ref_pattern = /(<ref([^>]*)?>([^<]*)?<\/ref>)?/mgi,
+               sup_pattern = /(<sup([^>]*)?>([^<]*)?<\/sup>)?/mgi,
+               pattern_2 = /''([^'']{2,})?''/mgi,
+               pattern_3 = /\{\{([^\}\}]{2,})?\}\}/mgi;
 
-                    var ru = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian",
-                        en = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_English",
-                        ru_lang = "http://en.wikipedia.org/wiki/Russian_language",
-                        old_date = "http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates",
-                        repell = "http://en.wikipedia.org/wiki/Wikipedia:Pronunciation_respelling_key";
+           var ru = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian",
+               en = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_English",
+               ru_lang = "http://en.wikipedia.org/wiki/Russian_language",
+               old_date = "http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates",
+               repell = "http://en.wikipedia.org/wiki/Wikipedia:Pronunciation_respelling_key";
+           
+           
+           /*
+                Perform a series of REGEXP to change the wikitext into presentation quality.
+                    - Drop the TOC
+                    - Drop photo and extra meta
+                    - Parse down to main body text
+                    - Clean out links, citations and references
+                    - Clean up some foreign language name issues (missing test cases for all)
                     
-                    var finaltext = wikitext.replace( comment_pattern, "")
-                                            .replace( ref_pattern, "")
-                                            .replace( sup_pattern, "")                                            
-                                            .replace(pattern, function(m, key, value) {
-                        console.log(m, key, value)
-                        var splits = key.split("|")
-                        var display_title = splits[1] || splits[0] 
-                        var link_string =  '<a target="new" href="http://wikipedia.org/wiki/'; 
-                            link_string += encodeURIComponent(splits[0]) + '">';
-                            link_string += display_title+'</a>';
-                        return link_string;
-                    }).replace( pattern_2, function(m, key, value) {
-                        console.log(m, key, value)
-                        return '<i>' + key + '</i>'
-                    }).replace(pattern_3, function(m, key, value) {
-                          console.log("matching brackets", m)
-                          if( key.toLowerCase().indexOf("cite") === 0 ) {
-                              return ""
-                          } 
-                          var bracket_keys = key.split("|");
-                          if(bracket_keys[0] === "pron-en" || bracket_keys[0] === "pronEng") {
-                              return 'pronounced <a href="'+ en +'">/' + bracket_keys[1] + '/</a>'
-                          }
-                          
-                          if( bracket_keys[0] === "IPA-ru") {
-                              return 'pronounced <a href="'+ru+'">'+ bracket_keys[1]+'</a>'
-                          }
-                          
-                          if(bracket_keys[0] === "lang-ru") {
-                              return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
-                          }
-                          
-                          if(bracket_keys[0] === "IPAc-en" || bracket_keys[0] === "audio-ru") {
-                              return "";
-                          }
-                          
-                          
-                          if(bracket_keys[0] === "respell") {
-                             bracket_keys.shift();
-                             return '<a href="'+repell+'">' + bracket_keys.join("-") + '</a>' 
-                          }
-                          
-                          if(bracket_keys[0] === "OldStyleDate") {
-                              bracket_keys.shift();
-                              var replace_text = "";
-                              var old_style = bracket_keys.pop();
-                              
-                              bracket_keys.splice(1,0,'[<a href="'+old_date+'">O.S.</a> '+old_style+']')
-                              return bracket_keys.join(" ");
-                              
-                          }
-                          return bracket_keys[bracket_keys.length] || key;
-                    });
+                TODO:
+                    Refacture this code, it's gross - maybe a yahoo pipe?
+                        Upside, only one call, so far 99.9% accuracy for name provided by iwl.me
                     
-                    //.replace("\n\n", '</p><p>')
-                    /*
-                        I am going to put the graphs is a temp array
+           */
+           
+           var finaltext = wikitext.replace( comment_pattern, "")
+                                   .replace( ref_pattern, "")
+                                   .replace( sup_pattern, "")                                            
+                                   .replace(pattern, function(m, key, value) {
+               console.log(m, key, value)
+               var splits = key.split("|")
+               var display_title = splits[1] || splits[0] 
+               var link_string =  '<a target="new" href="http://wikipedia.org/wiki/'; 
+                   link_string += encodeURIComponent(splits[0]) + '">';
+                   link_string += display_title+'</a>';
+               return link_string;
+           }).replace( pattern_2, function(m, key, value) {
+               console.log(m, key, value)
+               return '<i>' + key + '</i>'
+           }).replace(pattern_3, function(m, key, value) {
+                 console.log("matching brackets", m)
+                 if( key.toLowerCase().indexOf("cite") === 0 ) {
+                     return "";
+                 } 
+                 var bracket_keys = key.split("|");
+                 if(bracket_keys[0] === "pron-en" || bracket_keys[0] === "pronEng") {
+                     return 'pronounced <a href="'+ en +'">/' + bracket_keys[1] + '/</a>'
+                 }
+                 
+                 if( bracket_keys[0] === "IPA-ru") {
+                     return 'pronounced <a href="'+ru+'">'+ bracket_keys[1]+'</a>'
+                 }
+                 
+                 if(bracket_keys[0] === "lang-ru") {
+                     return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
+                 }
+                 
+                 if(bracket_keys[0] === "IPAc-en" || bracket_keys[0] === "audio-ru") {
+                     return "";
+                 }
+                 
+                 
+                 if(bracket_keys[0] === "respell") {
+                    bracket_keys.shift();
+                    return '<a href="'+repell+'">' + bracket_keys.join("-") + '</a>' 
+                 }
+                 
+                 if(bracket_keys[0] === "OldStyleDate") {
+                     bracket_keys.shift();
+                     var replace_text = "";
+                     var old_style = bracket_keys.pop();
+                     
+                     bracket_keys.splice(1,0,'[<a href="'+old_date+'">O.S.</a> '+old_style+']')
+                     return bracket_keys.join(" ");
+                     
+                 }
+                 return bracket_keys[bracket_keys.length] || key;
+           });
+           
+           //.replace("\n\n", '</p><p>')
+           /*
+               I am going to put the graphs is a temp array
+           
+           */
+           var graphs = finaltext.split("\n\n"), word_count = 0, pos=1;
+           for(var i=0; i<graphs.length; i++) {
+               var words = graphs[i].split(" ")
+               word_count += words.length;
+               
+               
+               if(word_count > 80 ) {
+                   break;
+               }
+               pos+=1
+           }
+           finaltext = graphs.slice(0,pos).join("</p><p>")
+           
+           /*
+               I cannot trim for length based on spaces until I resolve the {{}} issues in foreign names
+           */
+           //.replace("\n\n", '</p><p>');
+           
+           //finaltext = finaltext.split("\n\n")[0]
+           
+           
+           return '<p>' + finaltext + '</p>';
+       }                
+       
+       
+       function processwikipediaResponse( json_message, page_url, tab_id ) {
+           /*
+               {"query":{"pages":{"220477":{"pageid":220477,"ns":0,"title":"Cory Doctorow","revisions"
+           */
+           var pattern = /\{\{.*\}\}/mgi;
+           var regex = new RegExp(pattern)
+           var j = json_message.query.pages, wikitext;
+           for(var k in j) {
+               // HAHA
+               j[k].title;
+               wikitext = j[k].revisions[0]["*"]
+               break;
+           }
+           //console.log(wikitext)
+           //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
+           var items = wikitext.split("'''")
+           
+           items.shift();
+           var display_text = items.join(' ');
+           display_text = makewikiLinks( display_text )
+           ///// , clean_text = wikitext.replace("Infobox", "liar").replace(regex, "")
+           var localdata = localfetch( page_url );
+           //console.log(clean_text);
+           if(localdata)  {
+               localdata.wikitext = display_text;
+           }
+           localstore( page_url, localdata )
+           // i wan to send data to the script damnit!
+           //, data : {"foo" : "bar"}
+           
+           /*
+                The Long and winding road
+                    Have the tab id of where this request came from to prevent RACE CONDITIONS
+                    TODO:
+                    Check to see that this tab still exists or otherwise error handle
                     
-                    */
-                    var graphs = finaltext.split("\n\n"), word_count = 0, pos=1;
-                    for(var i=0; i<graphs.length; i++) {
-                        var words = graphs[i].split(" ")
-                        word_count += words.length;
-                        
-                        
-                        if(word_count > 80 ) {
-                            break;
-                        }
-                        pos+=1
-                    }
-                    finaltext = graphs.slice(0,pos).join("</p><p>")
-                    
-                    /*
-                        I cannot trim for length based on spaces until I resolve the {{}} issues in foreign names
-                    */
-                    //.replace("\n\n", '</p><p>');
-                    
-                    //finaltext = finaltext.split("\n\n")[0]
-                    
-                    
-                    return '<p>' + finaltext + '</p>';
-                }                
-                
-                
-                function processwikipediaResponse( json_message, page_url ) {
-                    /*
-                        {"query":{"pages":{"220477":{"pageid":220477,"ns":0,"title":"Cory Doctorow","revisions"
-                    */
-                    var pattern = /\{\{.*\}\}/mgi;
-                    var regex = new RegExp(pattern)
-                    var j = json_message.query.pages, wikitext;
-                    for(var k in j) {
-                        // HAHA
-                        j[k].title;
-                        wikitext = j[k].revisions[0]["*"]
-                        break;
-                    }
-                    //console.log(wikitext)
-                    //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
-                    var items = wikitext.split("'''")
-                    
-                    items.shift();
-                    var display_text = items.join(' ');
-                    display_text = makewikiLinks( display_text )
-                    ///// , clean_text = wikitext.replace("Infobox", "liar").replace(regex, "")
-                    var localdata = localfetch( page_url );
-                    //console.log(clean_text);
-                    if(localdata)  {
-                        localdata.wikitext = display_text;
-                    }
-                    localstore( page_url, localdata )
-                    // i wan to send data to the script damnit!
-                    //, data : {"foo" : "bar"}
-                    chrome.tabs.insertCSS(null, {file : "css/ficly_story_widget.css"})
-                    chrome.tabs.executeScript(null, {file: "js/content_scripts/ficly_story_widget.js"}); 
-                    
-                                        
-                }
-                
+           */
+           chrome.tabs.insertCSS(tab_id, {file : "css/ficly_story_widget.css"})
+           chrome.tabs.executeScript(tab_id, {file: "js/content_scripts/ficly_story_widget.js"}); 
+           
+                               
+       }
+       
 
-                
-                function makeWikiRequest( author, page_url ) {
-                    // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
-                    var xhr = new XMLHttpRequest();
-                    var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + encodeURIComponent( author )
-                    xhr.open("POST", url, true);
-                    xhr.onreadystatechange = function() {
-                        console.log("thingking", xhr)
-                      if (xhr.readyState == 4) {
-                        // innerText does not let the attacker inject HTML elements.
-                        //console.log(xhr.responseText)
-                        document.getElementById("escape_worker").innerText = xhr.responseText;
+       
+       function makeWikiRequest( author, page_url, tab_id ) {
+           // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
+           var xhr = new XMLHttpRequest();
+           var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + encodeURIComponent( author )
+           xhr.open("POST", url, true);
+           xhr.onreadystatechange = function() {
+               console.log("thingking", xhr)
+             if (xhr.readyState == 4) {
+               // innerText does not let the attacker inject HTML elements.
+               //console.log(xhr.responseText)
+               document.getElementById("escape_worker").innerText = xhr.responseText;
 
-                        var json_message = JSON.parse(xhr.responseText)
-                        // console.log(json_message)  
-                        processwikipediaResponse( json_message, page_url )                      
-                      }
-                    }
-                    console.log("send request to wikipedia")
-                    xhr.send();                    
-                    
-                }
-                
-                function makeRequest( message, callback, type ) {
-                    var xhr = new XMLHttpRequest();
-                    var method_type = type || "GET"
-                    document.getElementById("escape_worker").innerHTML = message
-                    //console.log(document.getElementById("escape_worker").innerText)
-                    var safe_message = document.getElementById("escape_worker").innerText
-                    xhr.open(method_type, "http://iwl.me/?text=" + encodeURIComponent(safe_message), true)
-                    xhr.onreadystatechange = function() {
-                      if (xhr.readyState == 4) {
-                        // innerText does not let the attacker inject HTML elements.
-                        document.getElementById("escape_worker").innerText = xhr.responseText;
-                        callback(document.getElementById("escape_worker").innerText);
-                        // clean up
-                        document.getElementById("escape_worker").innerText = ""
-                      }
-                    }
-                    xhr.send();                    
-                }
-                
-                function iwl_response_handler(  response, callback, page_url ) {
+               var json_message = JSON.parse(xhr.responseText)
+               // console.log(json_message)  
+               processwikipediaResponse( json_message, page_url, tab_id )                      
+             }
+           }
+           console.log("send request to wikipedia")
+           xhr.send();                    
+           
+       }
+       
+       function makeRequest( message, callback, type ) {
+           var xhr = new XMLHttpRequest();
+           var method_type = type || "GET"
+           document.getElementById("escape_worker").innerHTML = message
+           //console.log(document.getElementById("escape_worker").innerText)
+           var safe_message = document.getElementById("escape_worker").innerText
+           xhr.open(method_type, "http://iwl.me/?text=" + encodeURIComponent(safe_message), true)
+           xhr.onreadystatechange = function() {
+             if (xhr.readyState == 4) {
+               // innerText does not let the attacker inject HTML elements.
+               document.getElementById("escape_worker").innerText = xhr.responseText;
+               callback(document.getElementById("escape_worker").innerText);
+               // clean up
+               document.getElementById("escape_worker").innerText = ""
+             }
+           }
+           xhr.send();                    
+       }
+       
+       function iwl_response_handler(  response, callback, page_url, tab_id ) {
 
-                    var iwl_author = parseIWLTitle( response ),
-                        affiliate_link = parseAffiliateLink( response, iwl_author );
-                    console.log("more stuff", iwl_author, affiliate_link, page_url )
-                
-                    // save to local storage
-                    var data = {
-                        'author' : iwl_author,
-                        'link' : affiliate_link,
-                        'base_urls' : iwl_urls
-                    };
-                    localstore( page_url, data )
-                    makeWikiRequest( iwl_author, page_url )                    
-                    callback( data );
-                }
-                
-                chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
-                    if(!request.content) return;
-                    console.log(request, "in brain");
-                    console.log(sender);
-                    makeRequest( request.content, function(response) {
-                        // process page message
-                        iwl_response_handler(response, sendResponse, sender.tab.url);
-                    }, "POST" )
-                    // save the tab id and URL of this page so I can return it correctly
-                });
-                
-                chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
-                    if(!request.action || request.action !== "buildWidget") return;
-                    
-                    // okay, get the tab url
-                    // we hear this event when the ficly story widget is injected into a page
-                    console.log(sender, "this is the story widget trying to talk to me", request)
-                    // closest thing to uuid, a URI :)
-                    sender.tab.url
-                    var data = localfetch(  sender.tab.url )
-                    sendResponse( data )
-                    // save the tab id and URL of this page so I can return it correctly
-                });                
-                
-                
-                
-            </script>
+           var iwl_author = parseIWLTitle( response ),
+               affiliate_link = parseAffiliateLink( response, iwl_author );
+           console.log("more stuff", iwl_author, affiliate_link, page_url )
+       
+           // save to local storage
+           var data = {
+               'author' : iwl_author,
+               'link' : affiliate_link,
+               'base_urls' : iwl_urls
+           };
+           localstore( page_url, data )
+           makeWikiRequest( iwl_author, page_url, tab_id )                    
+           callback( data );
+       }
+       
+       chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
+           if(!request.content) return;
+           console.log(request, "in brain");
+           console.log(sender);
+           
+           /*
+                see if I have this story locally already and the text matches
+           */
+           var local_message = localfetch( sender.tab.url )
+           if(local_message) {
+               
+               
+           }
+           
+           makeRequest( request.content, function(response) {
+               // process page message
+               iwl_response_handler(response, sendResponse, sender.tab.url, sender.tab.id);
+           }, "POST" )
+           // save the tab id and URL of this page so I can return it correctly
+       });
+       
+       chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
+           if(!request.action || request.action !== "buildWidget") return;
+           
+           // okay, get the tab url
+           // we hear this event when the ficly story widget is injected into a page
+           console.log(sender, "this is the story widget trying to talk to me", request)
+           // closest thing to uuid, a URI :)
+           sender.tab.url
+           var data = localfetch(  sender.tab.url )
+           sendResponse( data )
+           // save the tab id and URL of this page so I can return it correctly
+       });                
+       
+       
+       
+   </script>
 
-      
+
     </body>
 </html>

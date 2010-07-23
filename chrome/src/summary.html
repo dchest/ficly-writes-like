@@ -74,7 +74,8 @@ return data.join("\n\n\n")
             
             function process_atom( doc  ) {
                 var entries = doc.getElementsByTagName("entry"), link, 
-                    list = [], data, graphs, title, story, key_url;
+                    list = [], data, graphs, title, story, key_url,
+                    frag = document.createDocumentFragment();
                 //console.log(entries)
                 for(var i=0; i<entries.length; i++) {
                     link = entries[i].getElementsByTagName("link")[0]
