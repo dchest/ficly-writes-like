@@ -14,3 +14,27 @@ http://en.wikipedia.org/w/index.php?title=Vladimir_Nabokov&action=edit
 
 http://ficly.com/stories/19342
 http://en.wikipedia.org/wiki/Cory_Doctorow
+
+
+http://ficly.com/stories/28
+http://en.wikipedia.org/wiki/Chuck_Palahniuk
+
+http://ficly.com/stories/30
+http://en.wikipedia.org/wiki/J._D._Salinger
+
+
+http://ficly.com/stories/1106
+http://en.wikipedia.org/wiki/George_Orwell
+
+
+http://ficly.com/stories/17769
+http://en.wikipedia.org/wiki/Isaac_Asimov
+
+Test for length
+http://ficly.com/stories/19111
+http://en.wikipedia.org/wiki/William_Gibson
+
+
+// huge error
+http://ficly.com/stories/4258
+// cannot get response from iwl.me

@@ -103,7 +103,8 @@
                     var ru = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian",
                         en = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_English",
                         ru_lang = "http://en.wikipedia.org/wiki/Russian_language",
-                        old_date = "http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates";
+                        old_date = "http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates",
+                        repell = "http://en.wikipedia.org/wiki/Wikipedia:Pronunciation_respelling_key";
                     
                     var finaltext = wikitext.replace( comment_pattern, "")
                                             .replace( ref_pattern, "")
@@ -125,7 +126,7 @@
                               return ""
                           } 
                           var bracket_keys = key.split("|");
-                          if(bracket_keys[0] === "pron-en") {
+                          if(bracket_keys[0] === "pron-en" || bracket_keys[0] === "pronEng") {
                               return 'pronounced <a href="'+ en +'">/' + bracket_keys[1] + '/</a>'
                           }
                           
@@ -135,6 +136,16 @@
                           
                           if(bracket_keys[0] === "lang-ru") {
                               return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
+                          }
+                          
+                          if(bracket_keys[0] === "IPAc-en") {
+                              return "";
+                          }
+                          
+                          
+                          if(bracket_keys[0] === "respell") {
+                             bracket_keys.shift();
+                             return '<a href="'+repell+'">' + bracket_keys.join("-") + '</a>' 
                           }
                           
                           if(bracket_keys[0] === "OldStyleDate") {
@@ -147,9 +158,25 @@
                               
                           }
                           return bracket_keys[bracket_keys.length] || key;
-                    }).replace("\n\n", '</p><p>');
-
+                    });
                     
+                    //.replace("\n\n", '</p><p>')
+                    /*
+                        I am going to put the graphs is a temp array
+                    
+                    */
+                    var graphs = finaltext.split("\n\n"), word_count = 0, pos=1;
+                    for(var i=0; i<graphs.length; i++) {
+                        var words = graphs[i].split(" ")
+                        word_count += words.length;
+                        
+                        
+                        if(word_count > 80 ) {
+                            break;
+                        }
+                        pos+=1
+                    }
+                    finaltext = graphs.slice(0,pos).join("</p><p>")
                     // var words = finaltext.split(" ")
                     // if(words.length > 50) {
                     //     // I should see if I just drop up an html tag....
@@ -241,7 +268,7 @@
                     document.getElementById("escape_worker").innerHTML = message
                     //console.log(document.getElementById("escape_worker").innerText)
                     var safe_message = document.getElementById("escape_worker").innerText
-                    xhr.open(method_type, "http://iwl.me/?text=" + safe_message, true)
+                    xhr.open(method_type, "http://iwl.me/?text=" + encodeURIComponent(safe_message), true)
                     xhr.onreadystatechange = function() {
                       if (xhr.readyState == 4) {
                         // innerText does not let the attacker inject HTML elements.

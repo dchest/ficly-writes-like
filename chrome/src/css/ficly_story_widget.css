@@ -27,8 +27,11 @@
     float:none;
     margin-top:10px;
     background-color:#F6F5F0;
+    position:relative;
     
 }
 .poweredby_image {
-    vertical-align:center;
+    position:absolute;
+    top:12px;
+    left:10px;
 }
