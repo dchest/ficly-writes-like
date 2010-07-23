@@ -13,3 +13,5 @@ This project contains the following nodes / sections
         Google Chrome Extension for the Ficly.com website
             Actions:
                 1. Takes a Ficly story or blog post, compares against iwl.me
+                2. Queryies Wikipedia to get summary for iwl.me author
+                3. Displays a 'widget' on the ficly.com with comparison data and wiki meta data.
