@@ -74,30 +74,72 @@ return data.join("\n\n\n")
             
             function process_atom( doc  ) {
                 var entries = doc.getElementsByTagName("entry"), link, 
-                    list = [], data, graphs, title, story, key_url,
-                    frag = document.createDocumentFragment();
+                    list = [], data = [], graphs = [], title, story, key_url,
+                    frag = document.createDocumentFragment(),
+                    worker = document.createElement("div");
                 //console.log(entries)
                 for(var i=0; i<entries.length; i++) {
                     link = entries[i].getElementsByTagName("link")[0]
                     key_url = link.getAttribute("href")
                     console.log(key_url)
                     title = entries[i].getElementsByTagName("title")[0].textContent;
-                    story = entries[i].getElementsByTagName("content")[0];
+                    story = entries[i].getElementsByTagName("content")[0].textContent;
                     console.log(story)
-                    graphs = story.getElementsByTagName("p");
+                    worker.innerHTML = story;
+
+                    graphs = worker.getElementsByTagName("p");
+                    data = [];
                     for(var j=0; j<graphs.length; j++) {
+                        console.log(graphs[j], "is the graph")
                         data.push( graphs[j].innerText );
                     }                    
                     list.push({ "urlkey" : key_url, 'title' : title, 'story' : data  })
                 }
                 //console.log(list)
-                processIWLData(list)
+                var html_string = processIWLData(list)
                 var p = document.getElementById("stories_list");
+                var d = make("div");
+                d.innerHTML = html_string;
+                p.appendChild(d);
+                // I am SURE this is here
                 
             }
             
             function processIWLData( json_list ) {
                 console.log(json_list)
+                var key, local_data, bg = chrome.extension.getBackgroundPage(), html_string = "";
+                for(var i=0; i<json_list.length; i++) {
+                    key = json_list[i].urlkey
+                    local_data = bg.localfetch( key )
+                    if(local_data) {
+                        // I seem to have seen this story, merge in the data
+                        json_list[i].iwl = local_data;
+                        html_string += buildElements(json_list[i])
+                        console.log("the local data is ", local_data)
+                    }
+                }
+                
+                return html_string;
+                
+                
+
+            }
+            function make(elem) {
+                return document.createElement(elem)
+            }
+            function buildElements( item ) {
+                var html = "<div>"
+                        html += item.title
+                        if(item.iwl) {
+                            // I have seen this piece, add the stuff
+                            html += " is written like " + item.iwl.author
+                        } else {
+                            // need to do ajax, make a list and make a div to add the data later
+                        }
+                
+                    html += '</div>'
+                    
+                return html;
             }
             
             

@@ -296,12 +296,7 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            /*
                 see if I have this story locally already and the text matches
            */
-           var local_message = localfetch( sender.tab.url )
-           if(local_message) {
-               
-               
-           }
-           
+           var local_message = localfetch( sender.tab.url )           
            makeRequest( request.content, function(response) {
                // process page message
                iwl_response_handler(response, sendResponse, sender.tab.url, sender.tab.id);
