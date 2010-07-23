@@ -50,13 +50,13 @@ function makeWidget( response_data ) {
     h1.innerHTML = "<a target='new' href='"+ iwl_url +"'>Written like " + response_data.author + '</a>';
     if(response_data.wikitext) wiki_content.innerHTML = response_data.wikitext + '<a target="new" href="http://en.wikipedia.org/wiki/'+encodeURIComponent(response_data.author)+'">Read more on Wikipedia</a>'
     
-    d_2.innerHTML = "<a href='"+chrome.extension.getURL("summary.html")+"'>Compare All My Work</a>"
+    //d_2.innerHTML = "<a href='"+chrome.extension.getURL("summary.html")+"'>Compare All My Work</a>"
     
     // I should test chaining here later, jquery makes me forget which one it works for...
     d.appendChild( h1 );
     d.appendChild( wiki_content );
     d.appendChild( iwl_link );
-    d.appendChild(d_2);
+    //d.appendChild(d_2);
 
 
     parent.appendChild( d );
