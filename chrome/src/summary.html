@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- MIME TYPE Guidlines and references: http://hixie.ch/advocacy/xhtml -->
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="awesome" />
+        <meta name="description" content="" />
+        
+    </head>
+    <body>
+        <div id="container">
+
+            <div id="top">
+
+            </div> <!-- end #top -->
+            
+            <div id="middle">
+                <h1 id="your_most_like">Your Most Like</h1>
+                
+                <p>We looked at <span>0</span> of the stories by <a href="">author</a></p>
+                
+                <div id="stories_list">
+                    
+                </div>
+
+            </div> <!-- END #middle -->
+        
+            <div id="bottom">
+
+            </div> <!-- end #bottom -->
+            
+        </div> <!-- end #container -->
+    
+        <script type="text/javascript" charset="utf-8">
+            // get the local storage function from background page
+            /*
+                grab the atom feed
+                http://ficly.com/authors/elshahawk/stories.atom
+            */
+            
+
+            function makeFeedRequest( callback ) {
+                var xhr = new XMLHttpRequest();
+                var url = "http://ficly.com/authors/elshahawk/stories.atom"
+                xhr.open("GET", url, true);
+                xhr.onreadystatechange = function() {
+                    console.log("thingking", xhr)
+                  if (xhr.readyState == 4) {
+                    // innerText does not let the attacker inject HTML elements.
+                    //console.log(xhr.responseText)
+                    callback( xhr.responseXML );
+                   
+                  }
+                }
+                console.log("send request to wikipedia")
+                xhr.send();
+            }
+            
+/*
+var content = document.getElementsByClassName('entry-content')[0];
+var graphs = content.getElementsByTagName("p");
+var data = [];
+
+// reformat the data a little bit, iwl.me is sensitive about HTML sometimes
+
+for(var i=0; i<graphs.length; i++) {
+    data.push( graphs[i].innerText );
+}
+
+return data.join("\n\n\n")
+*/            
+            
+            function process_atom( doc  ) {
+                var entries = doc.getElementsByTagName("entry"), link, 
+                    list = [], data, graphs, title, story, key_url;
+                //console.log(entries)
+                for(var i=0; i<entries.length; i++) {
+                    link = entries[i].getElementsByTagName("link")[0]
+                    key_url = link.getAttribute("href")
+                    console.log(key_url)
+                    title = entries[i].getElementsByTagName("title")[0].textContent;
+                    story = entries[i].getElementsByTagName("content")[0];
+                    console.log(story)
+                    graphs = story.getElementsByTagName("p");
+                    for(var j=0; j<graphs.length; j++) {
+                        data.push( graphs[j].innerText );
+                    }                    
+                    list.push({ "urlkey" : key_url, 'title' : title, 'story' : data  })
+                }
+                //console.log(list)
+                processIWLData(list)
+                var p = document.getElementById("stories_list");
+                
+            }
+            
+            function processIWLData( json_list ) {
+                console.log(json_list)
+            }
+            
+            
+            function init() {
+                
+                makeFeedRequest( process_atom );
+            }
+            
+            
+            
+            init();
+        </script>
+        
+
+      
+    </body>
+</html>

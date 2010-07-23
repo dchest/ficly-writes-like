@@ -7,7 +7,7 @@
 */
 
 
-
+var author_data = {}
 
 function url_parse() {
     var url_pattern = "\/([a-zA-Z]{2,})\/([a-zA-Z0-9\-_]{2,})\/?([a-zA-Z]{2,})?",
@@ -68,7 +68,8 @@ function analyze_urls() {
                 console.log("this is a blog post, grab the page data and commence the testing of this snippet to iwl.me")
                 // do div class entry
                 message = {
-                    content : find_entry_content()
+                    content : find_entry_content(),
+                    'author_data' : author_data
                 }
                 console.log(message)
                 
@@ -80,7 +81,8 @@ function analyze_urls() {
                 console.log("standard story")
 
                 message = {
-                    content : find_entry_content()
+                    content : find_entry_content(),
+                    'author_data' : author_data
                 }
                 console.log(message)                
                 
@@ -89,19 +91,18 @@ function analyze_urls() {
             break;
 
             case "new":
-                console.log("new ficly post... do nothing?? -- have a text area")
+                console.log("new ficly post... we'll wait till your ready for the public to say anything")
                 //
 
             break;
 
             case "edit":
-                console.log("currently editing piece (will have text area)")
+                console.log("currently editing piece, let's not judge")
                 // TODO
                 // everything
             break;
 
             default:
-                console.log("fall throw")
                 message = {};
                 // skipping ficly.com homepage & ficly.com/blog homepage (and lots of other stuff probaby)
             break;
@@ -120,6 +121,10 @@ function find_vcard() {
             var elem = lis[i].getElementsByTagName('a')[0],
                 current_user = elem.innerHTML
             console.log(current_user, typeof current_user, elem.getAttribute('href'))
+            author_data = {
+                author : current_user,
+                url : elem.getAttribute('href')
+            }
             //TODO
             // run the url parse on the href and get additional values if needed to local storage
         }
@@ -143,12 +148,12 @@ function init() {
     // find vcard
     // use pathname: document.location.pathname
 //    var url_pattern = "\/(blog)\/[a-zA-Z0-9\-]{2,}|\/(stories)\/[0-9]{1,10}|\/stories\/(new)|/stories/[0-9]{1,10}/(edit)|\/(authors)/[a-zA-Z]"
-
+    find_vcard();
     var message = analyze_urls();
     if(message) {
         phoneHome( message )
     }
-    find_vcard();
+
 }
 
 

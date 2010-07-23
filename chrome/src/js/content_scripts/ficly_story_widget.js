@@ -34,6 +34,7 @@ function makeWidget( response_data ) {
     console.log("make the widget", response_data)
     var d = make("div"), 
         h1 = make("h1"),
+        d_2 = make("div")
         wiki_content = make("div"), // rename this 
         iwl_link = make("a"),
         iwl_image = chrome.extension.getURL("images/iwl.png"),
@@ -49,10 +50,13 @@ function makeWidget( response_data ) {
     h1.innerHTML = "<a target='new' href='"+ iwl_url +"'>Written like " + response_data.author + '</a>';
     if(response_data.wikitext) wiki_content.innerHTML = response_data.wikitext + '<a target="new" href="http://en.wikipedia.org/wiki/'+encodeURIComponent(response_data.author)+'">Read more on Wikipedia</a>'
     
+    d_2.innerHTML = "<a href='"+chrome.extension.getURL("summary.html")+"'>Compare All My Work</a>"
+    
     // I should test chaining here later, jquery makes me forget which one it works for...
     d.appendChild( h1 );
-    d.appendChild( wiki_content )
-    d.appendChild( iwl_link )
+    d.appendChild( wiki_content );
+    d.appendChild( iwl_link );
+    d.appendChild(d_2);
 
 
     parent.appendChild( d );

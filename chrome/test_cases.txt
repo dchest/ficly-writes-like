@@ -30,6 +30,9 @@ http://en.wikipedia.org/wiki/George_Orwell
 http://ficly.com/stories/17769
 http://en.wikipedia.org/wiki/Isaac_Asimov
 
+http://ficly.com/stories/18413
+http://en.wikipedia.org/wiki/Leo_Tolstoy
+
 Test for length
 http://ficly.com/stories/19111
 http://en.wikipedia.org/wiki/William_Gibson
