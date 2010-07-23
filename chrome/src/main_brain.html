@@ -80,6 +80,23 @@
                     return matches && matches[1] || null
                 }
                 
+                function makewikiLinks( wikitext ) {
+                    var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi;
+                    var regex = new RegExp( pattern )
+                    console.log("running")
+                    var finaltext = wikitext.replace(regex, function(m, key, value) {
+                        console.log(m, key, value)
+                        var splits = key.split("|")
+                        var display_title = splits[1] || splits[0] 
+                        var link_string =  '<a href="http://wikipedia.org/wiki/'; 
+                            link_string += encodeURIComponent(splits[0]) + '">';
+                            link_string += display_title+'</a>';
+                        return link_string;
+                    });
+                    
+                    return finaltext;
+                }                
+                
                 
                 function processwikipediaResponse( json_message, page_url ) {
                     /*
@@ -97,11 +114,19 @@
                     //console.log(wikitext)
                     //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
                     var items = wikitext.split("'''")
-                    console.log(items)
-                    var localdata = localfetch( page_url ), clean_text = wikitext.replace("Infobox", "liar").replace(regex, "");
+                    
+                    // time for some crazy JS.. look for [[]] and {{}} and make links and whatnot or just remove...
+                    
+                    // trim the length of this text, give me about 4 lines with a more link
+                    
+                    
+                    var display_text = items.pop()
+                    display_text = makewikiLinks( display_text )
+                    ///// , clean_text = wikitext.replace("Infobox", "liar").replace(regex, "")
+                    var localdata = localfetch( page_url );
                     //console.log(clean_text);
                     if(localdata)  {
-                        localdata.wikitext = items.pop();
+                        localdata.wikitext = display_text;
                     }
                     localstore( page_url, localdata )
                     // i wan to send data to the script damnit!
@@ -109,6 +134,8 @@
                     chrome.tabs.executeScript(null, {file: "js/content_scripts/ficly_story_widget.js"}); 
                                         
                 }
+                
+
                 
                 function makeWikiRequest( author, page_url ) {
                     // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
