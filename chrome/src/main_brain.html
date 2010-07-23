@@ -2,7 +2,9 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
+<!-- 
+    See copyright in README
+-->
 <!-- MIME TYPE Guidlines and references: http://hixie.ch/advocacy/xhtml -->
 
 <!-- //chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
@@ -89,17 +91,7 @@
                         sup_pattern = /(<sup([^>]*)?>([^<]*)?<\/sup>)?/mgi,
                         pattern_2 = /''([^'']{2,})?''/mgi,
                         pattern_3 = /\{\{([^\}\}]{2,})?\}\}/mgi;
-                    
 
-                    console.log("running")
-                    
-                    /*
-                    .replace(ref_pattern, "")
-                        .replace( comment_pattern, "")
-                    
-                    
-                    */
-                    // .replace("\n", "")
                     var ru = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian",
                         en = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_English",
                         ru_lang = "http://en.wikipedia.org/wiki/Russian_language",
@@ -177,15 +169,6 @@
                         pos+=1
                     }
                     finaltext = graphs.slice(0,pos).join("</p><p>")
-                    // var words = finaltext.split(" ")
-                    // if(words.length > 50) {
-                    //     // I should see if I just drop up an html tag....
-                    //     
-                    //     
-                    //     words = words.slice(0,47)
-                    //     words.push("...")
-                    // }
-                    // finaltext = words.join(" ")
                     
                     /*
                         I cannot trim for length based on spaces until I resolve the {{}} issues in foreign names
@@ -215,10 +198,6 @@
                     //console.log(wikitext)
                     //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
                     var items = wikitext.split("'''")
-                    
-                    // time for some crazy JS.. look for [[]] and {{}} and make links and whatnot or just remove...
-                    
-                    // trim the length of this text, give me about 4 lines with a more link
                     
                     items.shift();
                     var display_text = items.join(' ');
@@ -282,13 +261,11 @@
                 }
                 
                 function iwl_response_handler(  response, callback, page_url ) {
-                    // crap scope problem - this is broken ATM
+
                     var iwl_author = parseIWLTitle( response ),
                         affiliate_link = parseAffiliateLink( response, iwl_author );
-                    //console.log(response, "author");
                     console.log("more stuff", iwl_author, affiliate_link, page_url )
-                    
-
+                
                     // save to local storage
                     var data = {
                         'author' : iwl_author,
@@ -296,19 +273,8 @@
                         'base_urls' : iwl_urls
                     };
                     localstore( page_url, data )
-                    
-                    // TODO
-                    // probably need to save the page_url and add this info from wikipedia
                     makeWikiRequest( iwl_author, page_url )                    
-                    
-                    callback( data );   
-                    
-                    
-                    // put everything like story url or  id into local storage, have the widget script send a 
-                    
-
-                    
-                                    
+                    callback( data );
                 }
                 
                 chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
@@ -316,12 +282,8 @@
                     console.log(request, "in brain");
                     console.log(sender);
                     makeRequest( request.content, function(response) {
+                        // process page message
                         iwl_response_handler(response, sendResponse, sender.tab.url);
-                        
-                        /*
-                            here is the money shot:
-                                I have the tab id and URL - therefore I should be able in inject a script into this page
-                        */
                     }, "POST" )
                     // save the tab id and URL of this page so I can return it correctly
                 });
@@ -330,7 +292,9 @@
                     if(!request.action || request.action !== "buildWidget") return;
                     
                     // okay, get the tab url
+                    // we hear this event when the ficly story widget is injected into a page
                     console.log(sender, "this is the story widget trying to talk to me", request)
+                    // closest thing to uuid, a URI :)
                     sender.tab.url
                     var data = localfetch(  sender.tab.url )
                     sendResponse( data )

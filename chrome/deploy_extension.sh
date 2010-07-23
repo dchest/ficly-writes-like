@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#### from bit.ly/chrome_extension via jehiah
+
+## TODO
+## solve issue with src.pem file generation and reuse, must manually delete the file to compile
+
 HOST_FILES="manifest.json"
 CWD=`pwd`
 #KEY="/PATH/to/chrome_extension.pem"

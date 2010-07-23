@@ -23,18 +23,7 @@ function find_entry_content() {
     var graphs = content.getElementsByTagName("p");
     var data = [];
     
-    // reformat the data a little bit, iwl.me is sensitive about HTML sometimes
-    /*
-        Strong Test Case:
-        http://ficly.com/stories/19409
-            copy paste results are Ursula K. Le Guin
-            
-            
-            Getting Back: Arthur C. Clarke
-            
-            // avoid overfitting
-            
-    */
+
     for(var i=0; i<graphs.length; i++) {
         data.push( graphs[i].innerText );
     }
