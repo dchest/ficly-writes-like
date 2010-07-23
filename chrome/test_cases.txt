@@ -1,6 +1,16 @@
 
 
-Sample:
+Samples:
 http://ficly.com/stories/19424
-http://en.wikipedia.org/w/index.php?title=Arthur_C._Clarke&action=edit
 http://en.wikipedia.org/wiki/Arthur_C._Clarke
+http://en.wikipedia.org/w/index.php?title=Arthur_C._Clarke&action=edit
+
+
+
+http://ficly.com/stories/19450
+http://en.wikipedia.org/wiki/Vladimir_Nabokov
+http://en.wikipedia.org/w/index.php?title=Vladimir_Nabokov&action=edit
+
+
+http://ficly.com/stories/19342
+http://en.wikipedia.org/wiki/Cory_Doctorow

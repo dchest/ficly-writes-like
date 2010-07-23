@@ -86,6 +86,7 @@
                     var pattern = /\[\[([^\]\]]{2,})?\]\]/mgi,
                         comment_pattern = /(<!--(.*)?-->)/mgi,
                         ref_pattern = /(<ref([^>]*)?>([^<]*)?<\/ref>)?/mgi,
+                        sup_pattern = /(<sup([^>]*)?>([^<]*)?<\/sup>)?/mgi,
                         pattern_2 = /''([^'']{2,})?''/mgi,
                         pattern_3 = /\{\{([^\}\}]{2,})?\}\}/mgi;
                     
@@ -98,9 +99,15 @@
                     
                     
                     */
-                    var finaltext = wikitext.replace("\n", "")
-                                            .replace( comment_pattern, "")
+                    // .replace("\n", "")
+                    var ru = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian",
+                        en = "http://en.wikipedia.org/wiki/Wikipedia:IPA_for_English",
+                        ru_lang = "http://en.wikipedia.org/wiki/Russian_language",
+                        old_date = "http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates";
+                    
+                    var finaltext = wikitext.replace( comment_pattern, "")
                                             .replace( ref_pattern, "")
+                                            .replace( sup_pattern, "")                                            
                                             .replace(pattern, function(m, key, value) {
                         console.log(m, key, value)
                         var splits = key.split("|")
@@ -112,15 +119,46 @@
                     }).replace( pattern_2, function(m, key, value) {
                         console.log(m, key, value)
                         return '<i>' + key + '</i>'
-                    })// .replace(pattern_3, function(m, key, value) {
-                    //                           console.log("matching brackets", m)
-                    //                           if( key.toLowerCase().indexOf("cite") === 0 ) {
-                    //                               return ""
-                    //                           } 
-                    //                           var bracket_keys = key.split("|");
-                    //                           return bracket_keys[bracket_keys.length] || key;
-                    //                     });
+                    }).replace(pattern_3, function(m, key, value) {
+                          console.log("matching brackets", m)
+                          if( key.toLowerCase().indexOf("cite") === 0 ) {
+                              return ""
+                          } 
+                          var bracket_keys = key.split("|");
+                          if(bracket_keys[0] === "pron-en") {
+                              return 'pronounced <a href="'+ en +'">/' + bracket_keys[1] + '/</a>'
+                          }
+                          
+                          if( bracket_keys[0] === "IPA-ru") {
+                              return 'pronounced <a href="'+ru+'">'+ bracket_keys[1]+'</a>'
+                          }
+                          
+                          if(bracket_keys[0] === "lang-ru") {
+                              return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
+                          }
+                          
+                          if(bracket_keys[0] === "OldStyleDate") {
+                              bracket_keys.shift();
+                              var replace_text = "";
+                              var old_style = bracket_keys.pop();
+                              
+                              bracket_keys.splice(1,0,'[<a href="'+old_date+'">O.S.</a> '+old_style+']')
+                              return bracket_keys.join(" ");
+                              
+                          }
+                          return bracket_keys[bracket_keys.length] || key;
+                    }).replace("\n\n", '</p><p>');
+
                     
+                    // var words = finaltext.split(" ")
+                    // if(words.length > 50) {
+                    //     // I should see if I just drop up an html tag....
+                    //     
+                    //     
+                    //     words = words.slice(0,47)
+                    //     words.push("...")
+                    // }
+                    // finaltext = words.join(" ")
                     
                     /*
                         I cannot trim for length based on spaces until I resolve the {{}} issues in foreign names
