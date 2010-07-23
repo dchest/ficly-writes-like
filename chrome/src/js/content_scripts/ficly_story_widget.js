@@ -34,19 +34,23 @@ function makeWidget( response_data ) {
     console.log("make the widget", response_data)
     var d = make("div"), 
         h1 = make("h1"),
+        p = make("p")
         iwl_link = make("a");
     
     iwl_link.setAttribute("href", response_data.base_urls.permalink + response_data.link)
     iwl_link.setAttribute("target", "new")    
     iwl_link.innerHTML = "Analyzed by iwl.me"
     h1.innerHTML = "In the style of " + response_data.author;
-    
+    if(response_data.wikitext) p.innerHTML = response_data.wikitext
     
     
     var parent = find_widget_parent();
     
+    // I should test chaining here later, jquery makes me forget which one it works for...
     d.appendChild( h1 );
+    d.appendChild( p )
     d.appendChild( iwl_link )
+
     parent.appendChild( d );
 }
 

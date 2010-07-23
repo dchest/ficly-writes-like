@@ -80,20 +80,54 @@
                     return matches && matches[1] || null
                 }
                 
-                function makeWikiRequest( author ) {
+                
+                function processwikipediaResponse( json_message, page_url ) {
+                    /*
+                        {"query":{"pages":{"220477":{"pageid":220477,"ns":0,"title":"Cory Doctorow","revisions"
+                    */
+                    var pattern = /\{\{.*\}\}/mgi;
+                    var regex = new RegExp(pattern)
+                    var j = json_message.query.pages, wikitext;
+                    for(var k in j) {
+                        // HAHA
+                        j[k].title;
+                        wikitext = j[k].revisions[0]["*"]
+                        break;
+                    }
+                    //console.log(wikitext)
+                    //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
+                    var items = wikitext.split("\n")
+                    console.log(items)
+                    var localdata = localfetch( page_url ), clean_text = wikitext.replace("Infobox", "liar").replace(regex, "");
+                    //console.log(clean_text);
+                    if(localdata)  {
+                        localdata.wikitext = items.pop();
+                    }
+                    localstore( page_url, localdata )
+                    // i wan to send data to the script damnit!
+                    //, data : {"foo" : "bar"}
+                    chrome.tabs.executeScript(null, {file: "js/content_scripts/ficly_story_widget.js"}); 
+                                        
+                }
+                
+                function makeWikiRequest( author, page_url ) {
                     // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
                     var xhr = new XMLHttpRequest();
-                    var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + author
-                    xhr.open("GET", url, true);
+                    var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + encodeURIComponent( author )
+                    xhr.open("POST", url, true);
                     xhr.onreadystatechange = function() {
+                        console.log("thingking", xhr)
                       if (xhr.readyState == 4) {
                         // innerText does not let the attacker inject HTML elements.
+                        //console.log(xhr.responseText)
                         document.getElementById("escape_worker").innerText = xhr.responseText;
 
                         var json_message = JSON.parse(xhr.responseText)
-                        console.log(json_message)                        
+                        // console.log(json_message)  
+                        processwikipediaResponse( json_message, page_url )                      
                       }
                     }
+                    console.log("send request to wikipedia")
                     xhr.send();                    
                     
                 }
@@ -124,7 +158,7 @@
                     //console.log(response, "author");
                     console.log("more stuff", iwl_author, affiliate_link, page_url )
                     
-                    //makeWikiRequest( iwl_author )
+
                     // save to local storage
                     var data = {
                         'author' : iwl_author,
@@ -133,12 +167,16 @@
                     };
                     localstore( page_url, data )
                     
+                    // TODO
+                    // probably need to save the page_url and add this info from wikipedia
+                    makeWikiRequest( iwl_author, page_url )                    
+                    
                     callback( data );   
                     
                     
                     // put everything like story url or  id into local storage, have the widget script send a 
                     
-                    chrome.tabs.executeScript(null, {file: "js/content_scripts/ficly_story_widget.js"}); 
+
                     
                                     
                 }
