@@ -1,0 +1,30 @@
+/*
+    Open source
+*/
+
+.ficly_writes_like_widget {
+    position:relative;
+    padding-top:10px;
+}
+.ficly_writes_like_widget h1 {
+    padding-bottom:10px;
+}
+.ficly_writes_like_widget h1 a {
+    color:#B51C2C;
+    font-size:16px;
+
+}
+.ficly_writes_like_widget p {
+    padding-bottom:6px;
+    line-height:1.6em;
+    padding-right:10px;
+}
+.poweredby_link {
+    display:block;
+    padding:10px;
+    text-align:right;
+    clear:both;
+    float:none;
+    margin-top:10px;
+    background-color:#F6F5F0;
+}

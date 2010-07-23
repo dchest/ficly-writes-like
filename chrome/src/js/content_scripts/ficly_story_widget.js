@@ -34,21 +34,24 @@ function makeWidget( response_data ) {
     console.log("make the widget", response_data)
     var d = make("div"), 
         h1 = make("h1"),
-        p = make("div"), // rename this 
+        wiki_content = make("div"), // rename this 
         iwl_link = make("a");
-    
-    iwl_link.setAttribute("href", response_data.base_urls.permalink + response_data.link)
+    d.className = "ficly_writes_like_widget"
+    // I should use the permalink when this author is you... which I think I can find out...
+    iwl_url = response_data.base_urls.share + response_data.link;
+    iwl_link.setAttribute("href", iwl_url)
+    iwl_link.className = "poweredby_link"
     iwl_link.setAttribute("target", "new")    
     iwl_link.innerHTML = "Analyzed by iwl.me"
-    h1.innerHTML = "In the style of " + response_data.author;
-    if(response_data.wikitext) p.innerHTML = response_data.wikitext
+    h1.innerHTML = "<a target='new' href='"+ iwl_url +"'>Written like " + response_data.author + '</a>';
+    if(response_data.wikitext) wiki_content.innerHTML = response_data.wikitext + '<a target="new" href="http://en.wikipedia.org/wiki/'+encodeURIComponent(response_data.author)+'">Read more on Wikipedia</a>'
     
     
     var parent = find_widget_parent();
     
     // I should test chaining here later, jquery makes me forget which one it works for...
     d.appendChild( h1 );
-    d.appendChild( p )
+    d.appendChild( wiki_content )
     d.appendChild( iwl_link )
 
     parent.appendChild( d );
