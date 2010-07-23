@@ -96,7 +96,7 @@
                     }
                     //console.log(wikitext)
                     //clean_text = wikitext.replace(/\\n/gm, "").replace("Infobox", "liar").replace(regex, "")
-                    var items = wikitext.split("\n")
+                    var items = wikitext.split("'''")
                     console.log(items)
                     var localdata = localfetch( page_url ), clean_text = wikitext.replace("Infobox", "liar").replace(regex, "");
                     //console.log(clean_text);
