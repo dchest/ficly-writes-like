@@ -15,3 +15,11 @@ This project contains the following nodes / sections
                 1. Takes a Ficly story or blog post, compares against iwl.me
                 2. Queries Wikipedia to get summary for iwl.me author
                 3. Displays a 'widget' on the ficly.com with comparison data and wiki meta data.
+                
+
+=== Status ===
+This project is currently is alpha / pre-alpha status. It is not intended for widespread distribution as of 7/24/2010. An internal TODO list reflects steps necessary to release into the Google Chrome Extension Gallery
+
+
+=== Installation ===
+The unpacked extension can be loaded into Google Chrome once the developer mode is enabled. Release version will be available shortly

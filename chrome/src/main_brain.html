@@ -7,7 +7,7 @@
 -->
 <!-- MIME TYPE Guidlines and references: http://hixie.ch/advocacy/xhtml -->
 
-<!-- //chrome.tabs.executeScript(null, {file: "content_script.js"}); -->
+
 
     <head>
         <title>ficly writes like brain</title>
@@ -50,9 +50,56 @@
            return null;                    
        }
        
+       
+       function params( obj ) {
+           var query_string = [];
+           //TODO
+           // cannot handle arrays or nested objects
+           for(var k in obj) {
+               query_string.push( k + "=" + encodeURIComponent( obj[k] ) );
+           }
+           return query_string.join("&")
+       }
+       
+       function ajaxRequest( obj ) {
+           var xhr = new XMLHttpRequest(), message;
+           xhr.open(obj.type || "GET", obj.url, true);           
+           xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    // do success
+                    if(xhr.status!=200) {
+                        if(obj.error) obj.error();
+                        console.log("status is not 200")
+                        return;
+                    }
+                    try {
+                        message = JSON.parse(xhr.responseText)
+                    } catch(e) {
+                        // NOT JSON
+                        message = xhr.responseXML || xhr.responseText
+                    }
+                    
+                    console.log(message)
+                    obj.success( message )
+                }
+           }
+           xhr.send( obj.data || null );
+           
+           return xhr;
+
+       }
+       
+       /* 
+            IWL Specific Hack handler:
+                Get the Code for the permalink / share from the HTML response
+       */       
+       
+       
        function parseAffiliateLink( message_string, author ) {
            
            /*
+                Sample Case:
+                    Here is the URL I am looking for
 http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
            */
            var pattern = '<a href="http:\/\/iwl.me\/[^/]+\/(.*?)".*>'+ author + '<\/a>'
@@ -172,14 +219,7 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                pos+=1
            }
            finaltext = graphs.slice(0,pos).join("</p><p>")
-           
-           /*
-               I cannot trim for length based on spaces until I resolve the {{}} issues in foreign names
-           */
-           //.replace("\n\n", '</p><p>');
-           
-           //finaltext = finaltext.split("\n\n")[0]
-           
+
            
            return '<p>' + finaltext + '</p>';
        }                
@@ -212,7 +252,9 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                localdata.wikitext = display_text;
            }
            localstore( page_url, localdata )
-           // i wan to send data to the script damnit!
+           // Can I send data- 
+           // TODO
+           // Test if data can be passed directly to script
            //, data : {"foo" : "bar"}
            
            /*
@@ -228,43 +270,34 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                                
        }
        
-       function params( obj ) {
-           var query_string = [];
-           //TODO
-           // cannot handle arrays or nested objects
-           for(var k in obj) {
-               query_string.push( k + "=" + encodeURIComponent( obj[k] ) );
-           }
-           return query_string.join("&")
-       }
-       
-       function ajaxRequest( obj ) {
-           var xhr = new XMLHttpRequest(), message;
-           xhr.open(obj.type || "GET", obj.url, true);           
-           xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4) {
-                    // do success
-                    if(xhr.status!=200) {
-                        if(obj.error) obj.error();
-                        console.log("status is not 200")
-                        return;
-                    }
-                    try {
-                        message = JSON.parse(xhr.responseText)
-                    } catch(e) {
-                        // NOT JSON
-                        message = xhr.responseXML || xhr.responseText
-                    }
-                    
-                    console.log(message)
-                    obj.success( message )
-                }
-           }
-           xhr.send( obj.data || null );
-           
-           return xhr;
+       function iwl_response_handler(  response, callback, page_url, tab_id ) {
 
-       }
+           var iwl_author = parseIWLTitle( response ),
+               affiliate_link = parseAffiliateLink( response, iwl_author );
+           console.log("more stuff", iwl_author, affiliate_link, page_url )
+       
+           // save to local storage
+           var data = {
+               'author' : iwl_author,
+               'link' : affiliate_link,
+               'base_urls' : iwl_urls
+           };
+           localstore( page_url, data )
+           makeWikiRequest( iwl_author, page_url, tab_id )                    
+           callback( data );
+       }       
+       
+       
+       /*
+            Connections Section:
+            
+                Connect Wikipedia
+                Connect IWL (getting HTML back)
+                Connect to content script: message_dispatcher.js
+                Connect to  content_script: ficly_story_widget.js
+       */
+       
+
        
        function makeWikiRequest( author, page_url, tab_id ) {
            // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
@@ -290,7 +323,8 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            
            var safe_message = worker.innerText, 
                 iwl_params = {
-                    text : safe_message, 'permalink' : permalink
+                    text : safe_message, 
+                    'permalink' : permalink
                 };
                 
                 //
@@ -303,22 +337,7 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                   
        }
        
-       function iwl_response_handler(  response, callback, page_url, tab_id ) {
 
-           var iwl_author = parseIWLTitle( response ),
-               affiliate_link = parseAffiliateLink( response, iwl_author );
-           console.log("more stuff", iwl_author, affiliate_link, page_url )
-       
-           // save to local storage
-           var data = {
-               'author' : iwl_author,
-               'link' : affiliate_link,
-               'base_urls' : iwl_urls
-           };
-           localstore( page_url, data )
-           makeWikiRequest( iwl_author, page_url, tab_id )                    
-           callback( data );
-       }
        
        chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
            if(!request.content) return;
