@@ -85,6 +85,15 @@ function analyze_urls() {
 
             break;
 
+            case "authors":
+                console.log("author page")
+                if(matches[3]) return;
+                message = {
+                    'action' : 'injectAuthorWidget'
+                }
+            
+            break;
+
             case "edit":
                 console.log("currently editing piece, let's not judge")
                 // TODO

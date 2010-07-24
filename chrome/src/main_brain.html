@@ -227,7 +227,7 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
        }                
        
        
-       function processwikipediaResponse( json_message, page_url, tab_id ) {
+       function processwikipediaResponse( json_message, author, page_url, tab_id ) {
            /*
                {"query":{"pages":{"220477":{"pageid":220477,"ns":0,"title":"Cory Doctorow","revisions"
            */
@@ -248,12 +248,11 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            var display_text = items.join(' ');
            display_text = makewikiLinks( display_text )
            ///// , clean_text = wikitext.replace("Infobox", "liar").replace(regex, "")
-           var localdata = localfetch( page_url );
-           //console.log(clean_text);
-           if(localdata)  {
-               localdata.wikitext = display_text;
-           }
-           localstore( page_url, localdata )
+           
+
+
+           // store wikipedia data elsewhere, save on calls - only like 50 authors
+           localstore( author, display_text)
            // Can I send data- 
            // TODO
            // Test if data can be passed directly to script
@@ -266,10 +265,14 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                     Check to see that this tab still exists or otherwise error handle
                     
            */
-           chrome.tabs.insertCSS(tab_id, {file : "css/ficly_story_widget.css"})
-           chrome.tabs.executeScript(tab_id, {file: "js/content_scripts/ficly_story_widget.js"}); 
-           
+
+           addStoryWidget(  tab_id  );
                                
+       }
+       
+       function addStoryWidget( tab_id ) {
+           chrome.tabs.insertCSS(tab_id, {file : "css/ficly_story_widget.css"})
+           chrome.tabs.executeScript(tab_id, {file: "js/content_scripts/ficly_story_widget.js"});           
        }
        
        function iwl_response_handler(  response, callback, page_url, tab_id ) {
@@ -281,12 +284,23 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            // save to local storage
            var data = {
                'author' : iwl_author,
-               'link' : affiliate_link,
-               'base_urls' : iwl_urls
+               'link' : affiliate_link
            };
            localstore( page_url, data )
-           makeWikiRequest( iwl_author, page_url, tab_id )                    
-           callback( data );
+           
+           callback( data );           
+
+           // 
+           console.log("finish processing")
+           var wikipedia_author_data = localfetch( iwl_author );
+           if(!wikipedia_author_data) {
+               makeWikiRequest( iwl_author, page_url, tab_id )
+           } else {
+               console.log("fetching from cache", iwl_author)
+               addStoryWidget( tab_id  );
+           }
+
+
        }       
        
        
@@ -314,7 +328,7 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            ajaxRequest({
                url : "http://en.wikipedia.org/w/api.php?" + params( wiki_params ),
                success : function(jo) {
-                   processwikipediaResponse( jo, page_url, tab_id )
+                   processwikipediaResponse( jo, author, page_url, tab_id )
                }
            });           
        }
@@ -353,19 +367,40 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            })
            // save the tab id and URL of this page so I can return it correctly
        });
+
        
-       chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
-           if(!request.action || request.action !== "buildWidget") return;
+       chrome.extension.onRequest.addListener(function( request, sender, sendResponse) {
+            if(!request.action) return;
+            
+            switch(request.action) {
+                
+                case "injectAuthorWidget":
+                    chrome.tabs.executeScript(sender.tab.id, {file: "js/content_scripts/ficly_author_widget.js"});                     
+                break;
+                
+                case "buildWidget":
+                    var data = localfetch(  sender.tab.url )
+                    data.base_urls = iwl_urls;
+                    data.wikitext = localfetch( data.author );
+                    sendResponse( data )                    
+                break;
+                
+                case "buildAuthorWidget":
+                    console.log("author widget alive", request, request.links)
+                    //TODO
+                    // call local storage for these values
+                    // assemble a response
+                    // return
+                    sendResponse({"foo" : "bar"})
+                break;
+                
+                default:
+                    // fall throw
+                break;
+                
+            }
            
-           // okay, get the tab url
-           // we hear this event when the ficly story widget is injected into a page
-           console.log(sender, "this is the story widget trying to talk to me", request)
-           // closest thing to uuid, a URI :)
-           sender.tab.url
-           var data = localfetch(  sender.tab.url )
-           sendResponse( data )
-           // save the tab id and URL of this page so I can return it correctly
-       });                
+       });              
        
        
        
