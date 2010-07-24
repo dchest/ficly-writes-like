@@ -228,47 +228,79 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                                
        }
        
+       function params( obj ) {
+           var query_string = [];
+           //TODO
+           // cannot handle arrays or nested objects
+           for(var k in obj) {
+               query_string.push( k + "=" + encodeURIComponent( obj[k] ) );
+           }
+           return query_string.join("&")
+       }
+       
+       function ajaxRequest( obj ) {
+           var xhr = new XMLHttpRequest(), message;
+           xhr.open(obj.type || "GET", obj.url, true);           
+           xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    // do success
+                    if(xhr.status!=200) {
+                        if(obj.error) obj.error();
+                        console.log("status is not 200")
+                        return;
+                    }
+                    try {
+                        message = JSON.parse(xhr.responseText)
+                    } catch(e) {
+                        // NOT JSON
+                        message = xhr.responseXML || xhr.responseText
+                    }
+                    
+                    console.log(message)
+                    obj.success( message )
+                }
+           }
+           xhr.send( obj.data || null );
+           
+           return xhr;
 
+       }
        
        function makeWikiRequest( author, page_url, tab_id ) {
            // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
-           var xhr = new XMLHttpRequest();
-           var url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&rvsection=0&format=json&titles=" + encodeURIComponent( author )
-           xhr.open("POST", url, true);
-           xhr.onreadystatechange = function() {
-               console.log("thingking", xhr)
-             if (xhr.readyState == 4) {
-               // innerText does not let the attacker inject HTML elements.
-               //console.log(xhr.responseText)
-               document.getElementById("escape_worker").innerText = xhr.responseText;
-
-               var json_message = JSON.parse(xhr.responseText)
-               // console.log(json_message)  
-               processwikipediaResponse( json_message, page_url, tab_id )                      
-             }
+           var wiki_params = {
+               action : "query",
+               prop : "revisions",
+               rvprop : "content",
+               rvsection : 0,
+               format : "json",
+               titles : author
            }
-           console.log("send request to wikipedia")
-           xhr.send();                    
-           
+           ajaxRequest({
+               url : "http://en.wikipedia.org/w/api.php?" + params( wiki_params ),
+               success : function(jo) {
+                   processwikipediaResponse( jo, page_url, tab_id )
+               }
+           });           
        }
        
-       function makeRequest( message, callback, type ) {
-           var xhr = new XMLHttpRequest();
-           var method_type = type || "GET"
-           document.getElementById("escape_worker").innerHTML = message
-           //console.log(document.getElementById("escape_worker").innerText)
-           var safe_message = document.getElementById("escape_worker").innerText
-           xhr.open(method_type, "http://iwl.me/?text=" + encodeURIComponent(safe_message), true)
-           xhr.onreadystatechange = function() {
-             if (xhr.readyState == 4) {
-               // innerText does not let the attacker inject HTML elements.
-               document.getElementById("escape_worker").innerText = xhr.responseText;
-               callback(document.getElementById("escape_worker").innerText);
-               // clean up
-               document.getElementById("escape_worker").innerText = ""
-             }
-           }
-           xhr.send();                    
+       function makeIWLRequest( message, permalink, callback ) {
+           var worker = document.getElementById("escape_worker");
+           worker.innerHTML = message
+           
+           var safe_message = worker.innerText, 
+                iwl_params = {
+                    text : safe_message, 'permalink' : permalink
+                };
+                
+                //
+           
+           ajaxRequest({
+              url : 'http://iwl.me/?' + params(iwl_params),
+              type : "POST",
+              success : callback
+           });
+                  
        }
        
        function iwl_response_handler(  response, callback, page_url, tab_id ) {
@@ -290,22 +322,14 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
        
        chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
            if(!request.content) return;
-           console.log(request, "in brain");
-           console.log(sender);
+           console.log(request, "in brain", sender);
            
-           /*
-                see if I have this story locally already and the text matches
-           */
-           var local_message = localfetch( sender.tab.url )
-           if(local_message) {
-               
-               
-           }
-           
-           makeRequest( request.content, function(response) {
+           makeIWLRequest( request.content, sender.tab.url, function(response) {
                // process page message
+               //TODO
+               // yuck too much nesting, clean this up later
                iwl_response_handler(response, sendResponse, sender.tab.url, sender.tab.id);
-           }, "POST" )
+           })
            // save the tab id and URL of this page so I can return it correctly
        });
        
