@@ -1,4 +1,8 @@
 /*
+    
+    Copyright: See README
+    http://github.com/gregory80/ficly-writes-like
+    
     This is a story page level widget
         ( or at least it's intended structure)
     
@@ -62,14 +66,5 @@ function makeWidget( response_data ) {
     parent.appendChild( d );
 }
 
-
-// chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-//     // make the widget NOW!
-//     makeWidget();
-// });
+// Phone Home and get Data Needed to populate widget
 chrome.extension.sendRequest({'action' : 'buildWidget'}, makeWidget)
-
-
-
-
-/// at the end of this file, open a send request? 

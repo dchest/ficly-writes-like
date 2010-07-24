@@ -128,16 +128,15 @@ function phoneHome( message ) {
 }
 
 function brain_callback( message ) {
-    console.log(message, "message from the brain to message_dispatcher.js")
+    //console.log(message, "message from the brain to message_dispatcher.js")
+    //TODO
+    // do something with response from brain - maybe make a promo widget?
 }
 
 function init() {
     console.log('i am awake', document.location)
-    
-    // find vcard
-    // use pathname: document.location.pathname
-//    var url_pattern = "\/(blog)\/[a-zA-Z0-9\-]{2,}|\/(stories)\/[0-9]{1,10}|\/stories\/(new)|/stories/[0-9]{1,10}/(edit)|\/(authors)/[a-zA-Z]"
-    find_vcard();
+
+    find_vcard(); // who am I logged in as? 
     var message = analyze_urls();
     if(message) {
         phoneHome( message )
