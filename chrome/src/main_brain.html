@@ -168,29 +168,31 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                      return "";
                  } 
                  var bracket_keys = key.split("|");
-                 if(bracket_keys[0] === "pron-en" || bracket_keys[0] === "pronEng") {
+                 var k1 = bracket_keys[0].toLowerCase();
+                 if(k1 === "pron-en" || k1 === "proneng") {
                      return 'pronounced <a href="'+ en +'">/' + bracket_keys[1] + '/</a>'
                  }
                  
-                 if( bracket_keys[0] === "IPA-ru") {
+                 if( k1 === "ipa-ru") {
                      return 'pronounced <a href="'+ru+'">'+ bracket_keys[1]+'</a>'
                  }
                  
-                 if(bracket_keys[0] === "lang-ru") {
+                 if(k1 === "lang-ru") {
                      return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
                  }
                  
-                 if(bracket_keys[0] === "IPAc-en" || bracket_keys[0] === "audio-ru") {
+                 if(k1 === "ipac-en" || k1 === "audio-ru") {
                      return "";
                  }
                  
                  
-                 if(bracket_keys[0] === "respell") {
+                 if(k1 === "respell") {
                     bracket_keys.shift();
                     return '<a href="'+repell+'">' + bracket_keys.join("-") + '</a>' 
                  }
                  
-                 if(bracket_keys[0] === "OldStyleDate") {
+                 //OldStyleDate
+                 if(k1 === "oldstyledate") {
                      bracket_keys.shift();
                      var replace_text = "";
                      var old_style = bracket_keys.pop();

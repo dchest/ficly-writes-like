@@ -3,6 +3,11 @@ import tornado
 import tornado.httpclient
 import urllib
 
+"""This file is merely a 'test' case for posting to IWL. 
+    It is not needed by the extension for any reason than 
+    testing iwl.me format and response"""
+
+
 class IWLHack():
     
 

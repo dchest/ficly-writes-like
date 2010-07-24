@@ -1,6 +1,11 @@
+/*
+    This is just a big list of test cases for wikipedia parsing, which is spotty at best. 
+    Ideally, I would not have to parse wikitext in JS, but I cannot get the exact 
+    data I want out in any decent format
+        (HTML reponse blows...tables - puck)
+*/
 
-
-Samples:
+Wikipedia Test Samples:
 http://ficly.com/stories/19424
 http://en.wikipedia.org/wiki/Arthur_C._Clarke
 http://en.wikipedia.org/w/index.php?title=Arthur_C._Clarke&action=edit
@@ -13,6 +18,7 @@ http://en.wikipedia.org/w/index.php?title=Vladimir_Nabokov&action=edit
 
 
 http://ficly.com/stories/19342
+http://ficly.com/stories/4258
 http://en.wikipedia.org/wiki/Cory_Doctorow
 
 
@@ -33,11 +39,14 @@ http://en.wikipedia.org/wiki/Isaac_Asimov
 http://ficly.com/stories/18413
 http://en.wikipedia.org/wiki/Leo_Tolstoy
 
+http://ficly.com/stories/19409
+http://en.wikipedia.org/wiki/Ursula_K._Le_Guin
+
+
 Test for length
 http://ficly.com/stories/19111
 http://en.wikipedia.org/wiki/William_Gibson
 
 
-// huge error
-http://ficly.com/stories/4258
-// cannot get response from iwl.me
+
+
