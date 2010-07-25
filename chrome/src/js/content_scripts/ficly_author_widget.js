@@ -24,6 +24,34 @@ var story_elements;
 
 function makeWidget( data ) {
     console.log("making author widget", data)
+    var html = "", style_influence = data.style_influence, 
+        widget_p = document.getElementById("secondary-content");
+    
+    html += '<div class="users-box">'
+        html += '<h2>Read and Analyzed ' + data.length + '</h2>';
+        
+        if(style_influence.length > 0 ) {
+            html += '<ul>'
+            for(var i=0; i<style_influence.length; i++) {
+                html += '<li>'
+                    html += '<a target="new" href="http://en.wikipedia.org/wiki/'+ style_influence[i].name +'">' + style_influence[i].name + '</a>'
+                    html += " (" + style_influence[i].count + ")";
+                html += '</li>'
+            }
+            html += '</ul>'
+            
+        } else {
+            html += '<p>You haven\'t read anything yet!'
+        }
+
+        
+    html += '</div>'
+    
+    var d = make("div");
+    d.className = "ficly_author_widget"
+    d.innerHTML = html;
+    widget_p.appendChild(d);
+    
 }
 
 function findStories() {
@@ -43,6 +71,9 @@ function findStories() {
     // phone home (to brain) with links
     chrome.extension.sendRequest({'action' : 'buildAuthorWidget', 'links' : links }, makeWidget)
 
+}
+function make(elem) {
+    return document.createElement(elem)
 }
 
 function init() {

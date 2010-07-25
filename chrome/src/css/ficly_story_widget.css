@@ -35,3 +35,19 @@
     top:12px;
     left:10px;
 }
+
+/* probably need to rename this  */
+.ficly_author_widget {
+    
+}
+
+.ficly_author_widget div.users-box ul li, .ficly_author_widget div.users-box ul li a {
+
+    float:none;
+    clear:both;
+}
+.ficly_author_widget div.users-box ul li {
+    display:block;
+    padding-bottom:5px;
+    font-size:14px;
+}
