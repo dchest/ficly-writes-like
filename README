@@ -18,8 +18,15 @@ This project contains the following nodes / sections
                 
 
 === Status ===
+
 This project is currently is alpha / pre-alpha status. It is not intended for widespread distribution as of 7/24/2010. An internal TODO list reflects steps necessary to release into the Google Chrome Extension Gallery
 
 
 === Installation ===
+
 The unpacked extension can be loaded into Google Chrome once the developer mode is enabled. Release version will be available shortly
+
+
+=== Storage ===
+
+This extension caches responses from wikipedia.org and iwl.me into localStorage. This data is used to create author profile widgets as well. It is not shared or saved in any other manner. Currently, it is entirely temporary and does not use local SQL DB. Cache data can be lost by un-installing the widget or other behavior that clears window.localStorage. Future revisions may consider more aggressive storage options, including cloud data syncing
