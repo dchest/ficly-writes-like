@@ -51,7 +51,28 @@ function makeWidget( data ) {
     d.className = "ficly_author_widget"
     d.innerHTML = html;
     widget_p.appendChild(d);
+    insertIWLStyleInline( data );
     
+}
+
+function insertIWLStyleInline(  story_data  ) {
+    var elems = document.getElementsByClassName("hentry"), stories = story_data.results, meta_data;
+    
+    for(var i=0; i<elems.length; i++) {
+        // 
+        var link_elem = elems[i].getElementsByClassName("entry-title")[0].getElementsByTagName("a")[0];
+        var link = link_elem.getAttribute("href");
+        meta_data = stories[link]
+        //console.log(meta_data)
+        if(meta_data) {
+            var p = elems[i].getElementsByTagName("ul")[0];
+            var li = make("li");
+            li.className = "posted";
+            li.innerHTML = 'in the style of <a target="new" href="'+ meta_data.base_urls.share + meta_data.link +'">'  + meta_data.author + '</a>'
+            p.appendChild( li )
+        }
+        // get the UL, add " in the style of author" <-- link to iwl.me
+    }
 }
 
 function findStories() {
