@@ -46,7 +46,7 @@ function makeWidget( response_data ) {
         img = '<img class="poweredby_image" src="'+iwl_image+'" alt="" border="0" />';
     d.className = "ficly_writes_like_widget"
     // I should use the permalink when this author is you... which I think I can find out...
-    iwl_url = response_data.base_urls.share + response_data.link;
+    iwl_url = response_data.share_link;
     iwl_link.setAttribute("href", iwl_url)
     iwl_link.className = "poweredby_link";
     iwl_link.setAttribute("target", "new")    

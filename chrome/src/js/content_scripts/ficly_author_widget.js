@@ -68,7 +68,7 @@ function insertIWLStyleInline(  story_data  ) {
             var p = elems[i].getElementsByTagName("ul")[0];
             var li = make("li");
             li.className = "posted";
-            li.innerHTML = 'in the style of <a target="new" href="'+ meta_data.base_urls.share + meta_data.link +'">'  + meta_data.author + '</a>'
+            li.innerHTML = 'in the style of <a target="new" href="'+ meta_data.share_link +'">'  + meta_data.author + '</a>'
             p.appendChild( li )
         }
         // get the UL, add " in the style of author" <-- link to iwl.me

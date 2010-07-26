@@ -30,13 +30,7 @@
             Start storing to SQL DB, if ext is re-installed / reloaded all storage is lost
             
        */
-       
-       var iwl_urls = {
-           "money" : "http://iwl.me/w/",
-           "share" : "http://iwl.me/s/",
-           "permalink" : "http://iwl.me/b/"
-       }
-       
+              
        function localstore( itemKey, itemValue ) {
            // do I need to remove this key first??
            var response = window.localStorage.setItem( itemKey, window.JSON.stringify( itemValue ) );
@@ -94,33 +88,6 @@
 
        }
        
-       /* 
-            IWL Specific Hack handler:
-                Get the Code for the permalink / share from the HTML response
-       */       
-       
-       
-       function parseAffiliateLink( message_string, author ) {
-           
-           /*
-                Sample Case:
-                    Here is the URL I am looking for
-http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:none">David Foster Wallace</a>                    
-           */
-           var pattern = '<a href="http:\/\/iwl.me\/[^/]+\/(.*?)".*>'+ author + '<\/a>'
-           var regex = new RegExp(pattern);
-           var matches = message_string.match(regex)
-           console.log("affiliate match", matches)
-           return matches && matches[1] || null
-       }
-       
-       function parseIWLTitle( message_string ) {
-           var pattern = "<title>I Write Like (.{3,})<\/title>"
-           var regex = new RegExp(pattern)
-           var matches = message_string.match(regex)
-           //console.log("matches", matches)
-           return matches && matches[1] || null
-       }
        
        function processKnownLinks( links ) {
            var iwl_data, wikitext, results = {}, count = 0, authors = [], author_influence=[];
@@ -145,19 +112,18 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                    // not very likely scenario - only can happen in localstorage is corrupt or cleared
                    iwl_data.wikitext = wikitext;
                    var url = links[i];
-                   iwl_data.base_urls = iwl_urls;
                    results[url] = iwl_data;
                    count += 1;
                }
            }
            
-           
+           // sort most common author influence to top of list
            author_influence = author_influence.sort(function(a,b) {
                if(a.count > b.count) return -1;
                else if( a.count < b.count ) return 1;
                               
                return 0;
-           })
+           });
            
            var response = { "results" : results, 'length' : count, 'authors' : authors, "style_influence" : author_influence };
            console.log(response)
@@ -200,35 +166,30 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            chrome.tabs.executeScript(tab_id, {file: "js/content_scripts/ficly_story_widget.js"});           
        }
        
-       function iwl_response_handler(  response, callback, page_url, tab_id ) {
-
-           var iwl_author = parseIWLTitle( response ),
-               affiliate_link = parseAffiliateLink( response, iwl_author );
-           console.log("more stuff", iwl_author, affiliate_link, page_url )
-       
-           // save to local storage
-           var data = {
-               'author' : iwl_author,
-               'link' : affiliate_link
-           };
-           localstore( page_url, data )
+       function iwl_api_response_handler( json_message, page_url, tab_id, callback ) {
+           console.log("this is the new api", json_message)
+           var iwl_author = json_message.writer,
+               data = {
+                   'author' : json_message.writer,
+                   'share_link' : json_message.share_link,
+                   'id' : json_message.id,
+                   'writer_link' : json_message.writer_link,
+                   'badge_link' : json_message.badge_link
+                }
+           localstore( page_url, data );
+           callback( data );
            
-           callback( data );           
-
-           // 
-           console.log("finish processing")
+           
+           // get wiki data
            var wikipedia_author_data = localfetch( iwl_author );
            if(!wikipedia_author_data) {
                makeWikiRequest( iwl_author, page_url, tab_id )
            } else {
                console.log("fetching from cache", iwl_author)
                addStoryWidget( tab_id  );
-           }
-
-
-       }       
-       
-       
+           }           
+       } 
+              
        /*
             Connections Section:
             
@@ -265,13 +226,14 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
            var safe_message = worker.innerText, 
                 iwl_params = {
                     text : safe_message, 
-                    'permalink' : permalink
+                    'permalink' : permalink,
+                    'client_id' : 'ocfidlhokkgiplgkloboblpodggmplpi'
                 };
                 
                 //
            
            ajaxRequest({
-              url : 'http://iwl.me/?' + params(iwl_params),
+              url : 'http://iwl.me/api?' + params(iwl_params),
               type : "POST",
               success : callback
            });
@@ -281,14 +243,12 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
 
        
        chrome.extension.onRequest.addListener(function( request, sender, sendResponse ) {
-           if(!request.content) return;
-           console.log(request, "in brain", sender);
-           
+           if(!request.content) return;           
            makeIWLRequest( request.content, sender.tab.url, function(response) {
                // process page message
                //TODO
                // yuck too much nesting, clean this up later
-               iwl_response_handler(response, sendResponse, sender.tab.url, sender.tab.id);
+               iwl_api_response_handler( response, sender.tab.url, sender.tab.id, sendResponse );
            })
            // save the tab id and URL of this page so I can return it correctly
        });
@@ -306,7 +266,6 @@ http://iwl.me/w/d7939cdb" style="font-size:30px;color:#698B22;text-decoration:no
                 
                 case "buildWidget":
                     var data = localfetch(  sender.tab.url )
-                    data.base_urls = iwl_urls;
                     data.wikitext = localfetch( data.author );
                     sendResponse( data )                    
                 break;
