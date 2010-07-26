@@ -1,25 +1,30 @@
-#######
+##################################################
 ##
 ##  copyright (c) http://github.com/gregory80 2010
 ##  Dual licensed under the MIT and GPL licenses.
 ##          Stated Intent of License: Allow next developer to use this work is anyway they see fit, karma.
 ##
-#######
+##################################################
 
 
 This project contains the following nodes / sections
     
     Chrome
         Google Chrome Extension for the Ficly.com website
-            Actions:
+            Story Actions:
                 1. Takes a Ficly story or blog post, compares against iwl.me
                 2. Queries Wikipedia to get summary for iwl.me author
                 3. Displays a 'widget' on the ficly.com with comparison data and wiki meta data.
+            Author Actions
+                1. On author pages, http://ficly.com/authors/elshahawk, display analysis data
+                2. Look at all links to ficly.com stories on page, look up in local storage
+                3. Display widget of top 'read' authors (ficly stories you've looked at already)
+                4. Display inline 'in the style of "author"' next to read stories
                 
 
 === Status ===
 
-This project is currently is alpha / pre-alpha status. It is not intended for widespread distribution as of 7/24/2010. An internal TODO list reflects steps necessary to release into the Google Chrome Extension Gallery
+This project is currently is alpha / pre-alpha status. It is not intended for widespread distribution as of 7/26/2010. An internal TODO list reflects steps necessary to release into the Google Chrome Extension Gallery
 
 
 === Installation ===
@@ -30,3 +35,8 @@ The unpacked extension can be loaded into Google Chrome once the developer mode 
 === Storage ===
 
 This extension caches responses from wikipedia.org and iwl.me into localStorage. This data is used to create author profile widgets as well. It is not shared or saved in any other manner. Currently, it is entirely temporary and does not use local SQL DB. Cache data can be lost by un-installing the widget or other behavior that clears window.localStorage. Future revisions may consider more aggressive storage options, including cloud data syncing
+
+=== Thanks & Acknowledgements ===
+
+Many, many thanks to the amazing people at ficly.com, iwl.me and wikipedia.org for allowing open access to their data! As well as XXXXXXX@gmail.com for the amazing icon that made it possible to release the extension to the public. 
+

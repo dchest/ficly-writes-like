@@ -32,6 +32,11 @@ http://en.wikipedia.org/wiki/J._D._Salinger
 http://ficly.com/stories/1106
 http://en.wikipedia.org/wiki/George_Orwell
 
+for {{ usage }}
+Cref2|B
+http://ficly.com/stories/19221
+http://en.wikipedia.org/wiki/Jane_Austen
+
 
 // failing atm
 http://ficly.com/stories/19393

@@ -89,7 +89,7 @@ function parseWikiText( wikitext ) {
               return '<a href="'+ru_lang+'">Russion: </a>' + bracket_keys[1];
           }
           
-          if(k1 === "ipac-en" || k1 === "audio-ru") {
+          if(k1 === "ipac-en" || k1 === "audio-ru" || k1 === "cref2") {
               return "";
           }
           
