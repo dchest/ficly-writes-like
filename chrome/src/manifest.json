@@ -10,10 +10,9 @@
   // "chrome_url_overrides": {
   //     "newtab": "local_history.html"
   //     },  
-  //"icons" : { 
-    //"48" : "",
-    //"128" : ""    
-  //},
+  "icons": { "16": "images/fwl_16.png",
+             "48": "images/fwl_48.png",
+            "128": "images/fwl_128.png" },
   "permissions": [
     "tabs", "http://ficly.com/", "http://iwl.me/", "http://en.wikipedia.org/"
   ],

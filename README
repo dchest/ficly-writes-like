@@ -38,5 +38,9 @@ This extension caches responses from wikipedia.org and iwl.me into localStorage.
 
 === Thanks & Acknowledgements ===
 
-Many, many thanks to the amazing people at ficly.com, iwl.me and wikipedia.org for allowing open access to their data! As well as XXXXXXX@gmail.com for the amazing icon that made it possible to release the extension to the public. 
+Many thanks to all the folks who provided services or data for this extension, including:
+    * The ficly.com Team
+    * The iwl.me Team 
+    * Claudeland Louis, http://claudelandlouis.com/ for icon design
+    * wikipedia.org for author summarys
 
