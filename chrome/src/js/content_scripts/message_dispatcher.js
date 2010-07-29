@@ -20,10 +20,10 @@ function url_parse() {
 function find_entry_content() {
     //return document.getElementsByClassName('entry-content')[0].innerHTML
     var content = document.getElementsByClassName('entry-content')[0];
-    var graphs = content.getElementsByTagName("p");
+    var graphs = content && content.getElementsByTagName("p") || [];
     var data = [];
     
-
+    if(graphs.length <= 0 ) return "";
     for(var i=0; i<graphs.length; i++) {
         data.push( graphs[i].innerText );
     }
