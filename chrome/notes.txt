@@ -14,7 +14,16 @@ then [[()]]
 
 
 
+chrome gallery cannot support comments in manifest.json file
+//"browser_action": {
+  //"default_title": "ficly writes like"
+//},
+// "chrome_url_overrides": {
+//     "newtab": "local_history.html"
+//     },
 
+THE update URL is only for DEV
+, "update_url": "http://clevernerd.com/chrome_extension_updates.xml"
 
 
 

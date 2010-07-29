@@ -24,12 +24,18 @@ This project contains the following nodes / sections
 
 === Status ===
 
-This project is currently is alpha / pre-alpha status. It is not intended for widespread distribution as of 7/26/2010. An internal TODO list reflects steps necessary to release into the Google Chrome Extension Gallery
+As of 7/29/2010, this project continues in a public alpha status. The extension may be downloaded via the Google Chrome Extension Gallery
+
+http://gt-co.de/ckw4JW <-- short url to below
+https://chrome.google.com/extensions/detail/hmgkocbacnpdfoklnggcjjipnicfnklf/
 
 
 === Installation ===
 
-The unpacked extension can be loaded into Google Chrome once the developer mode is enabled. Release version will be available shortly
+The unpacked extension can be loaded into Google Chrome once the developer mode is enabled. All other users can reach the extension here:
+
+http://gt-co.de/ckw4JW <-- short url to below
+https://chrome.google.com/extensions/detail/hmgkocbacnpdfoklnggcjjipnicfnklf/
 
 
 === Storage ===

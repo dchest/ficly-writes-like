@@ -1,28 +1,19 @@
 {
   "name": "ficly, writes like",
   "version": "0.1.1.14",
-  //"options_page": "options.html",
   "description": "What is this ficly like",
   "background_page": "main_brain.html",
-  //"browser_action": {
-    //"default_title": "ficly writes like"
-  //},
-  // "chrome_url_overrides": {
-  //     "newtab": "local_history.html"
-  //     },  
   "icons": { "16": "images/fwl_16.png",
              "48": "images/fwl_48.png",
             "128": "images/fwl_128.png" },
   "permissions": [
     "tabs", "http://ficly.com/", "http://iwl.me/", "http://en.wikipedia.org/"
   ],
-  
   "content_scripts": [
     {
 
      "matches": ["http://ficly.com/*"],
      "js": ["js/content_scripts/message_dispatcher.js"]
     }
-  ], "update_url": "http://clevernerd.com/chrome_extension_updates.xml"
+  ]
 }
-// 
