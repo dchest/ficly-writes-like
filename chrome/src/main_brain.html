@@ -167,7 +167,7 @@
        }
        
        function iwl_api_response_handler( json_message, page_url, tab_id, callback ) {
-           console.log("this is the new api", json_message)
+           //console.log("this is the new api", json_message)
            var iwl_author = json_message.writer,
                data = {
                    'author' : json_message.writer,
@@ -193,8 +193,8 @@
        /*
             Connections Section:
             
-                Connect Wikipedia
-                Connect IWL (getting HTML back)
+                Connect Wikipedia.org
+                Connect IWL.me
                 Connect to content script: message_dispatcher.js
                 Connect to  content_script: ficly_story_widget.js
        */
@@ -228,7 +228,7 @@
                 iwl_params = {
                     text : safe_message, 
                     'permalink' : permalink,
-                    'client_id' : 'ocfidlhokkgiplgkloboblpodggmplpi'
+                    'client_id' : 'hmgkocbacnpdfoklnggcjjipnicfnklf'
                 };
                 
                 //
@@ -272,7 +272,7 @@
                 break;
                 
                 case "buildAuthorWidget":
-                    console.log("author widget alive", request, request.links)
+                    //console.log("author widget alive", request, request.links)
                     //TODO
                     // call local storage for these values
                     // assemble a response

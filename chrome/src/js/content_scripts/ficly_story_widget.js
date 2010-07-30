@@ -23,7 +23,7 @@
 
 function find_widget_parent() {
     var elem = document.getElementById("secondary-content");
-    console.log(elem)
+    //console.log(elem)
     return elem;
 }
 
@@ -35,7 +35,7 @@ function make( type ) {
 }
 
 function makeWidget( response_data ) {
-    console.log("make the widget", response_data)
+    //console.log("make the widget", response_data)
     var d = make("div"), 
         h1 = make("h1"),
         d_2 = make("div")

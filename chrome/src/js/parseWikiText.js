@@ -60,7 +60,7 @@ function parseWikiText( wikitext ) {
                             .replace( pattern.ref, "")
                             .replace( pattern.sup, "")                                            
                             .replace(pattern.links, function(m, key, value) {
-        console.log(m, key, value)
+        //console.log(m, key, value)
         var splits = key.split("|")
         var display_title = splits[1] || splits[0] 
         var link_string =  '<a target="new" href="http://wikipedia.org/wiki/'; 
@@ -68,10 +68,10 @@ function parseWikiText( wikitext ) {
             link_string += display_title+'</a>';
         return link_string;
     }).replace( pattern.italics, function(m, key, value) {
-        console.log(m, key, value)
+        //console.log(m, key, value)
         return '<i>' + key + '</i>'
     }).replace(pattern.notes, function(m, key, value) {
-          console.log("matching brackets", m)
+          //console.log("matching brackets", m)
           if( key.toLowerCase().indexOf("cite") === 0 ) {
               return "";
           } 

@@ -23,7 +23,7 @@
 var story_elements;
 
 function makeWidget( data ) {
-    console.log("making author widget", data)
+    //console.log("making author widget", data)
     var html = "", style_influence = data.style_influence, 
         widget_p = document.getElementById("secondary-content");
     
@@ -77,7 +77,7 @@ function insertIWLStyleInline(  story_data  ) {
 
 function findStories() {
     var story_elems = document.getElementsByClassName("entry-title"), links = [];
-    console.log("found story elems", story_elems)
+    //console.log("found story elems", story_elems)
     story_elements = story_elems;
     for(var i=0; i<story_elems.length; i++) {
         var story = story_elems[i].getElementsByTagName("a")[0], title = story.innerText, link = story.getAttribute("href");
@@ -85,7 +85,7 @@ function findStories() {
         links.push( link )
     }
     
-    console.log("found stories", links)
+    //console.log("found stories", links)
     
     if(link.length <=0 ) return;
     

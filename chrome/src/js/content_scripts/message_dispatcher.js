@@ -45,48 +45,48 @@ function analyze_urls() {
         */
         
         var matches = url_parse(), message=null;
-        console.log("matches", matches)
+        //console.log("matches", matches)
         var page_type = matches && matches[1] || null
         if(page_type === null) {
-            console.log("not a page to worry about, bail")
+            //console.log("not a page to worry about, bail")
             return;
         }
         switch( page_type ) {
 
             case "blog":
-                console.log("this is a blog post, grab the page data and commence the testing of this snippet to iwl.me")
+                //console.log("this is a blog post, grab the page data and commence the testing of this snippet to iwl.me")
                 // do div class entry
                 message = {
                     content : find_entry_content(),
                     'author_data' : author_data
                 }
-                console.log(message)
+                //console.log(message)
                 
             break;
 
 
             case "stories":
                 if(matches[2] === "new" || matches[2] === "drafts") return;
-                console.log("standard story")
+                //console.log("standard story")
 
                 message = {
                     content : find_entry_content(),
                     'author_data' : author_data
                 }
-                console.log(message)                
+                //console.log(message)                
                 
                 // TODO
                 // stuff like send and analyze and load widget
             break;
 
             case "new":
-                console.log("new ficly post... we'll wait till your ready for the public to say anything")
+                //console.log("new ficly post... we'll wait till your ready for the public to say anything")
                 //
 
             break;
 
             case "authors":
-                console.log("author page")
+                //console.log("author page")
                 if(matches[3]) return;
                 message = {
                     'action' : 'injectAuthorWidget'
@@ -118,7 +118,7 @@ function find_vcard() {
         if(lis[i].className === "vcard") {
             var elem = lis[i].getElementsByTagName('a')[0],
                 current_user = elem.innerHTML
-            console.log(current_user, typeof current_user, elem.getAttribute('href'))
+            //console.log(current_user, typeof current_user, elem.getAttribute('href'))
             author_data = {
                 author : current_user,
                 url : elem.getAttribute('href')
@@ -143,7 +143,7 @@ function brain_callback( message ) {
 }
 
 function init() {
-    console.log('i am awake', document.location)
+    //console.log('i am awake', document.location)
 
     find_vcard(); // who am I logged in as? 
     var message = analyze_urls();
