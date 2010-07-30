@@ -154,7 +154,7 @@
            display_text = parseWikiText( display_text )
 
            // store wikipedia data under name, save on calls - only like 50 authors
-           localstore( author, display_text)
+           if(display_text.length > 30) localstore( author, display_text)
            addStoryWidget(  tab_id  );
                                
        }
@@ -182,7 +182,7 @@
            
            // get wiki data
            var wikipedia_author_data = localfetch( iwl_author );
-           if(!wikipedia_author_data) {
+           if(!wikipedia_author_data || wikipedia_author_data.length < 30) {
                makeWikiRequest( iwl_author, page_url, tab_id )
            } else {
                console.log("fetching from cache", iwl_author)
@@ -209,7 +209,8 @@
                rvprop : "content",
                rvsection : 0,
                format : "json",
-               titles : author
+               titles : author,
+               redirects : 1
            }
            ajaxRequest({
                url : "http://en.wikipedia.org/w/api.php?" + params( wiki_params ),
