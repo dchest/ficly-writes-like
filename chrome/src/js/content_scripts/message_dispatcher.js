@@ -66,7 +66,9 @@ function analyze_urls() {
 
 
             case "stories":
-                if(matches[2] === "new" || matches[2] === "drafts") return;
+            // TODO
+            // this is a little silly
+                if(matches[2] === "new" || matches[2] === "drafts" || matches[2] === "recent" || matches[2] === "active" || matches[2] === "popular") return;
                 //console.log("standard story")
 
                 message = {
@@ -88,8 +90,19 @@ function analyze_urls() {
             case "authors":
                 //console.log("author page")
                 if(matches[3]) return;
+                // who is this author?
+                // var hcard = document.getElementById("hcard");
+                // if(hcard) {
+                //     var tmp;
+                //     try{
+                //         tmp = hcard.getElementsByTagName("h1")[0].getElementsByTagName("a")[0].getAttribute("href");                        
+                //     } catch(e) {}
+                // 
+                //     if(tmp) story_feed_url = tmp + "/stories.atom";
+                // }
                 message = {
-                    'action' : 'injectAuthorWidget'
+                    'action' : 'injectAuthorWidget',
+                    'author_url' : document.location.protocol + "//" + document.location.hostname + document.location.pathname
                 }
             
             break;
@@ -107,7 +120,7 @@ function analyze_urls() {
         }        
         
         
-        
+        console.log(message, "page info")
         return message;
 }
 

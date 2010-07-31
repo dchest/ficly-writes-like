@@ -126,10 +126,39 @@
            });
            
            var response = { "results" : results, 'length' : count, 'authors' : authors, "style_influence" : author_influence };
-           console.log(response)
+           //console.log(response)
            
            return response;
        }
+       
+       function process_atom( doc  ) {
+           var entries = doc.getElementsByTagName("entry"),
+               list = [], data=[], graphs=[], title, story, key_url, link,
+               escaper = document.getElementById("escape_worker");
+               
+           for(var i=0; i<entries.length; i++) {
+               link = entries[i].getElementsByTagName("link")[0]
+               key_url = link.getAttribute("href")
+               //console.log(key_url)
+               title = entries[i].getElementsByTagName("title")[0].textContent;
+               story = entries[i].getElementsByTagName("content")[0].textContent;
+               //console.log(story)
+               escaper.innerHTML = story;
+               graphs = escaper.getElementsByTagName("p");
+               data=[];
+               for(var j=0; j<graphs.length; j++) {
+                   data.push( graphs[j].innerText );
+               }                    
+               list.push({ "urlkey" : key_url, 'title' : title, 'story' : data  })
+           }
+           escaper.innerHTML = "";
+           //console.log(list)
+           //processIWLData(list)
+           //var p = document.getElementById("stories_list");
+           
+           return list;
+           
+       }       
        
        
        function processwikipediaResponse( json_message, author, page_url, tab_id ) {
@@ -199,7 +228,52 @@
                 Connect to  content_script: ficly_story_widget.js
        */
        
+       function makeFiclyAuthorRequest( atom_url, callback ) {
+           ajaxRequest({
+               url : atom_url + "/stories.atom",
+               success : function(xml) {
+                   var author_story_meta = process_atom(xml), stories = [],
+                       max_story_count = 40, max_length = 4096, story_count=0,
+                       story, total_character_count = 0,
+                       final_stories = [];
+                       
+                   for(var i=0; i<author_story_meta.length; i++) {
+                       story = author_story_meta[i].story
+                       stories = stories.concat( story )
+                       
+                       for(var j=0; j<story.length; j++) {
+                           var tmp_measure = total_character_count + story[j].length
+                           if(tmp_measure < max_length) {
+                               total_character_count += story[j].length;
+                               final_stories.push( story[j] )
+                               story_count=i+1;
+                           }
+                       }
 
+                       //stories = stories.concat( author_story_meta[i].story );
+                   }
+                   console.log(" can only send so much text, you have graphs", stories.length);
+                   stories = final_stories;
+                   var text_length = (stories.join(" ")).length;
+                   console.log("sent text of length ", text_length )
+                   var message = stories.join("\n\n\n");
+
+                   makeIWLRequest( message, atom_url, function(jo) {
+                       console.log("iwl said of the last ", text_length, " characters you've written in ", stories.length, " graphs "  , jo.writer, jo);
+                       var curr_timestamp = (new Date()).getTime();
+                       
+                       jo.text_length = text_length;
+                       jo.graph_count = stories.length;
+                       jo.timestamp = curr_timestamp;
+                       jo.story_count = story_count;
+                       
+                       localstore(atom_url, jo);
+                       callback(jo, atom_url)
+                   });
+                   //processwikipediaResponse( jo, author, page_url, tab_id )
+               }
+           });           
+       }
        
        function makeWikiRequest( author, page_url, tab_id ) {
            // fix this to combine with makeresponse - pass in a URL as first arg instead... whatever
@@ -261,6 +335,28 @@
             switch(request.action) {
                 
                 case "injectAuthorWidget":
+                    // todo
+                    // cumlative style
+                        // check local storage
+                    // get the atom feed for this author ( by url?),
+                    // aggregate all the pieces together, send that, cache the results? - timecache it - like 1 day or something
+                    console.log(request.author_url)
+                    var author_summary_meta = localfetch( request.author_url );
+                    // 
+                    if(author_summary_meta) {
+                        // see how hold this is
+                        console.log("found item in cache", author_summary_meta)
+                    } else {
+                        // fetch the atom feed
+                        //makeFiclyAuthorRequest( request.author_atom );
+                        makeFiclyAuthorRequest( request.author_url, function(jo, permalink) {
+                            // send results to page
+                            console.log(jo)
+                        } );                        
+                    }
+                    
+
+                    
                     chrome.tabs.insertCSS(sender.tab.id, {file : "css/ficly_story_widget.css"})  
                     chrome.tabs.executeScript(sender.tab.id, {file: "js/content_scripts/ficly_author_widget.js"});  
                 break;
