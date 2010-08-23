@@ -136,6 +136,16 @@
                list = [], data=[], graphs=[], title, story, key_url, link,
                escaper = document.getElementById("escape_worker");
                
+               
+/*              
+                http://www.quirksmode.org/blog/archives/2008/01/using_the_assig.html 
+               // http://paste.ly/4Y5               
+               var x = document.getElementsByTagName('div');
+               for (var i=0,div;div=x[i];i++) {
+                   doSomething(div);
+               }
+                              
+*/               
            for(var i=0; i<entries.length; i++) {
                link = entries[i].getElementsByTagName("link")[0]
                key_url = link.getAttribute("href")
