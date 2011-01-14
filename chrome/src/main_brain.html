@@ -318,7 +318,8 @@
                 //
            
            ajaxRequest({
-              url : 'http://iwl.me/api?' + params(iwl_params),
+              url : 'http://iwl.me/api',
+              data : params(iwl_params),
               type : "POST",
               success : callback
            });
